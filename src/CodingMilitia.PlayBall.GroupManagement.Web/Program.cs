@@ -14,6 +14,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
     {
         public static void Main(string[] args)
         {
+            Console.WriteLine("############### Starting application ###############");
             CreateWebHostBuilder(args).Build().Run();
         }
 

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using CodingMilitia.PlayBall.GroupManagement.Web.Demo;
 using CodingMilitia.PlayBall.GroupManagement.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,11 +9,17 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
     [Route("groups")]
     public class GroupsController : Controller
     {
-        private static long currentGroupId = 1;
         private static List<GroupViewModel> groups = new List<GroupViewModel> { new GroupViewModel { Id = 1, Name = "Sample Group"} };
-
+        
+        private readonly IGroupIdGenerator _groupIdGenerator;
+        
+        public GroupsController(IGroupIdGenerator groupIdGenerator)
+        {
+            _groupIdGenerator = groupIdGenerator;
+        }
+        
         [HttpGet]
-        [Route("")] //not needed because Index would be used as default anyway
+        [Route("")]
         public IActionResult Index()
         {
             return View(groups);
@@ -61,7 +68,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult CreateReally(GroupViewModel model)
         {
-            model.Id = ++currentGroupId;
+            model.Id = _groupIdGenerator.Next();
             groups.Add(model);
 
             return RedirectToAction("Index");
