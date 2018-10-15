@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using CodingMilitia.PlayBall.GroupManagement.Web.Demo;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Web
@@ -14,11 +12,19 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
     {
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
-
-            services.AddSingleton<IGroupIdGenerator, GroupIdGenerator>();
+            
+            //if using default DI container, uncomment
+            //services.AddBusiness();
+            
+            // Add Autofac
+            var containerBuilder = new ContainerBuilder();
+            containerBuilder.RegisterModule<AutofacModule>();
+            containerBuilder.Populate(services);
+            var container = containerBuilder.Build();
+            return new AutofacServiceProvider(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
