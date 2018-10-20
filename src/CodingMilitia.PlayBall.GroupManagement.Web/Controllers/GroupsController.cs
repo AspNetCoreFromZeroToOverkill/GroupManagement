@@ -1,4 +1,5 @@
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
+using CodingMilitia.PlayBall.GroupManagement.Web.Demo;
 using CodingMilitia.PlayBall.GroupManagement.Web.Mappings;
 using CodingMilitia.PlayBall.GroupManagement.Web.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +10,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
     public class GroupsController : Controller
     {
         private readonly IGroupsService _groupsService;
+        private readonly SomeRootConfiguration _config;
+        private readonly DemoSecretsConfiguration _secrets;
 
-        public GroupsController(IGroupsService groupsService)
+        public GroupsController(IGroupsService groupsService, SomeRootConfiguration config, DemoSecretsConfiguration secrets)
         {
             _groupsService = groupsService;
+            _config = config;
+            _secrets = secrets;
         }
         
         [HttpGet]
