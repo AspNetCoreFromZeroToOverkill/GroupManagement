@@ -22,7 +22,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Demo.Middlewares
             await _next(context);
             watch.Stop();
             Interlocked.Increment(ref _requestCounter);
-            logger.LogWarning("Request {requestNumber} took {requestTime}ms", _requestCounter, watch.ElapsedMilliseconds);
+            logger.LogTrace("Request {requestNumber} took {requestTime}ms", _requestCounter, watch.ElapsedMilliseconds);
         }
     }
 }

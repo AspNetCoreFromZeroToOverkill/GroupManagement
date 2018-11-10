@@ -1,10 +1,14 @@
+using System;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
+using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Filters;
 using CodingMilitia.PlayBall.GroupManagement.Web.Mappings;
 using CodingMilitia.PlayBall.GroupManagement.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
 {
+    //[ServiceFilter(typeof(DemoExceptionFilter))]
+    [DemoExceptionFilterFactoryAttribute]
     [Route("groups")]
     public class GroupsController : Controller
     {
@@ -36,6 +40,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
             return View(group.ToViewModel());
         }
 
+        [DemoActionFilter]
         [HttpPost]
         [Route("{id}")]
         [ValidateAntiForgeryToken]
@@ -58,6 +63,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
             return View();
         }
 
+        [DemoActionFilter]
         [HttpPost]
         [Route("")]
         [ValidateAntiForgeryToken]

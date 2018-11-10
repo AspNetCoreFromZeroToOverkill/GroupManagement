@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Filters;
 using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -21,9 +22,13 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc();
+            services.AddMvc(options =>
+            {
+                options.Filters.Add<DemoActionFilter>();
+            });
 
             services.AddTransient<RequestTimingFactoryMiddleware>();
+            services.AddTransient<DemoExceptionFilter>();
             services.AddBusiness();
         }
 
