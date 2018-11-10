@@ -1,7 +1,8 @@
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Middlewares;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +16,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
         {
             _config = config;
         }
-        
+
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
@@ -36,6 +37,20 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
 
             app.UseStaticFiles();
 
+            app.MapWhen(
+                context => context.Request.Headers.ContainsKey("ping"),
+                builder =>
+                {
+                    builder.UseMiddleware<RequestTimingAdHocMiddleware>();
+                    builder.Run(async (context) => { await context.Response.WriteAsync("pong from header"); });
+                });
+            
+            app.Map("/ping", builder =>
+            {
+                builder.UseMiddleware<RequestTimingFactoryMiddleware>();
+                builder.Run(async (context) => { await context.Response.WriteAsync("pong from path"); });
+            });
+
             app.Use(async (context, next) =>
             {
                 context.Response.OnStarting(() =>
@@ -48,6 +63,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
             });
 
             app.UseMvc();
+
+            app.Run(async (context) =>
+            {
+                await context.Response.WriteAsync("No middlewares could handle the request");
+            });
         }
     }
 }
