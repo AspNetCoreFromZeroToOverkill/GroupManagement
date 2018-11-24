@@ -3,7 +3,7 @@
 <ul>
     @foreach (var group in Model)
     {
-        <li>@group.Name <a asp-controller="Groups" asp-action="Details" asp-route-id="@group.Id">Edit</a></li>
+        <li>@group.Name <a asp-controller="Groups" asp-action="DetailsAsync" asp-route-id="@group.Id">Edit</a></li>
     }
 </ul>
 

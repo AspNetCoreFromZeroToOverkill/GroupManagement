@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Business.Models;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
 
@@ -7,20 +10,27 @@ namespace CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services
 {
     public class InMemoryGroupsService : IGroupsService
     {
+        private static readonly Random RandomGenerator = new Random();
         private readonly List<Group> _groups = new List<Group>();
         private long _currentId = 0;
-        
-        public IReadOnlyCollection<Group> GetAll()
+
+        public Task<IReadOnlyCollection<Group>> GetAllAsync(CancellationToken ct)
         {
-            return _groups.AsReadOnly();
+            return Task.FromResult<IReadOnlyCollection<Group>>(_groups.AsReadOnly());
         }
 
-        public Group GetById(long id)
+        public async Task<Group> GetByIdAsync(long id, CancellationToken ct)
         {
+            await Task.Delay(1000, ct);
+            var extResult1Task = CallExternalServiceAsync(1, ct);
+            var extResult2Task = CallExternalServiceAsync(2, ct);
+
+            await Task.WhenAll(extResult1Task, extResult2Task);
+            
             return _groups.SingleOrDefault(g => g.Id == id);
         }
 
-        public Group Update(Group group)
+        public Task<Group> UpdateAsync(Group group, CancellationToken ct)
         {
             var toUpdate = _groups.SingleOrDefault(g => g.Id == group.Id);
 
@@ -30,14 +40,20 @@ namespace CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services
             }
 
             toUpdate.Name = group.Name;
-            return toUpdate;
+            return Task.FromResult(toUpdate);
         }
 
-        public Group Add(Group group)
+        public Task<Group> AddAsync(Group group, CancellationToken ct)
         {
             group.Id = ++_currentId;
             _groups.Add(group);
-            return group;
+            return Task.FromResult(group);
+        }
+
+        private async Task<int> CallExternalServiceAsync(int multiplier, CancellationToken ct)
+        {
+            await Task.Delay(1000 * multiplier);
+            return RandomGenerator.Next();
         }
     }
 }
