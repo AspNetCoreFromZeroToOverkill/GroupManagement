@@ -1,0 +1,10 @@
+@model IEnumerable<GroupViewModel>
+
+<ul>
+    @foreach (var group in Model)
+    {
+        <li>@group.Name <a asp-controller="Groups" asp-action="DetailsAsync" asp-route-id="@group.Id">Edit</a></li>
+    }
+</ul>
+
+<a asp-controller="Groups" asp-action="Create">Create</a>
