@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
-using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Filters;
-using CodingMilitia.PlayBall.GroupManagement.Web.Demo.Middlewares;
+using CodingMilitia.PlayBall.GroupManagement.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,13 +22,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(options =>
+            services.AddMvc();
+
+            services.AddDbContext<GroupManagementDbContext>(options =>
             {
-                options.Filters.Add<DemoActionFilter>();
+                options.UseNpgsql(_config.GetConnectionString("GroupManagementDbContext"));
+                options.EnableSensitiveDataLogging();
             });
 
-            services.AddTransient<RequestTimingFactoryMiddleware>();
-            services.AddTransient<DemoExceptionFilter>();
             services.AddBusiness();
         }
 
@@ -41,20 +42,6 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
             }
 
             app.UseStaticFiles();
-
-            app.MapWhen(
-                context => context.Request.Headers.ContainsKey("ping"),
-                builder =>
-                {
-                    builder.UseMiddleware<RequestTimingAdHocMiddleware>();
-                    builder.Run(async (context) => { await context.Response.WriteAsync("pong from header"); });
-                });
-            
-            app.Map("/ping", builder =>
-            {
-                builder.UseMiddleware<RequestTimingFactoryMiddleware>();
-                builder.Run(async (context) => { await context.Response.WriteAsync("pong from path"); });
-            });
 
             app.Use(async (context, next) =>
             {

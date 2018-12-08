@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMilitia.PlayBall.Grou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMilitia.PlayBall.GroupManagement.Business.Impl", "src\CodingMilitia.PlayBall.GroupManagement.Business.Impl\CodingMilitia.PlayBall.GroupManagement.Business.Impl.csproj", "{B46AD935-0616-432D-B472-808E45BE5878}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodingMilitia.PlayBall.GroupManagement.Data", "src\CodingMilitia.PlayBall.GroupManagement.Data\CodingMilitia.PlayBall.GroupManagement.Data.csproj", "{7FB6393A-ABCC-4838-8821-78FEAEBA699B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,10 +62,23 @@ Global
 		{B46AD935-0616-432D-B472-808E45BE5878}.Release|x64.Build.0 = Release|Any CPU
 		{B46AD935-0616-432D-B472-808E45BE5878}.Release|x86.ActiveCfg = Release|Any CPU
 		{B46AD935-0616-432D-B472-808E45BE5878}.Release|x86.Build.0 = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|x64.Build.0 = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Debug|x86.Build.0 = Debug|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|x64.ActiveCfg = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|x64.Build.0 = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|x86.ActiveCfg = Release|Any CPU
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{D5D5A923-C2D2-4A39-A4B7-6DF5977F66E7} = {75FA32CA-54CC-4ABE-B59A-AB1488DA6418}
 		{28D0DC04-AE36-4DC9-9126-F5C0C91EAA16} = {75FA32CA-54CC-4ABE-B59A-AB1488DA6418}
 		{B46AD935-0616-432D-B472-808E45BE5878} = {75FA32CA-54CC-4ABE-B59A-AB1488DA6418}
+		{7FB6393A-ABCC-4838-8821-78FEAEBA699B} = {75FA32CA-54CC-4ABE-B59A-AB1488DA6418}
 	EndGlobalSection
 EndGlobal
