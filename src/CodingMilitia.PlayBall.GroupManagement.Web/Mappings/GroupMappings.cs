@@ -10,12 +10,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Mappings
     {
         public static GroupViewModel ToViewModel(this Group model)
         {
-            return model != null ? new GroupViewModel { Id = model.Id, Name = model.Name } : null;
+            return model != null ? new GroupViewModel { Id = model.Id, Name = model.Name, RowVersion = model.RowVersion} : null;
         }
         
         public static Group ToServiceModel(this GroupViewModel model)
         {
-            return model != null ? new Group { Id = model.Id, Name = model.Name } : null;
+            return model != null ? new Group { Id = model.Id, Name = model.Name, RowVersion = model.RowVersion} : null;
         }
 
         public static IReadOnlyCollection<GroupViewModel> ToViewModel(this IReadOnlyCollection<Group> models)
