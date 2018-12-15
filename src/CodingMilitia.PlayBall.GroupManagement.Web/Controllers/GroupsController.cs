@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
 {
     [Route("groups")]
-    public class GroupsController : Controller
+    public class GroupsController : ControllerBase
     {
         private readonly IGroupsService _groupsService;
 
@@ -19,16 +19,16 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
 
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> IndexAsync(CancellationToken ct)
+        public async Task<IActionResult> GetAllAsync(CancellationToken ct)
         {
             var result = await _groupsService.GetAllAsync(ct);
-            return View("Index", result.ToViewModel());
+            return Ok(result.ToModel());
         }
 
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> DetailsAsync(long id, CancellationToken ct)
+        public async Task<IActionResult> GetByIdAsync(long id, CancellationToken ct)
         {
             var group = await _groupsService.GetByIdAsync(id, ct);
 
@@ -37,39 +37,37 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
                 return NotFound();
             }
 
-            return View("Details", group.ToViewModel());
+            return Ok(group.ToModel());
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("{id}")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditAsync(long id, GroupViewModel model, CancellationToken ct)
+        public async Task<IActionResult> UpdateAsync(long id, GroupModel model, CancellationToken ct)
         {
+            model.Id = id; //not needed when we move to MediatR
             var group = await _groupsService.UpdateAsync(model.ToServiceModel(), ct);
-
-            if (group == null)
-            {
-                return NotFound();
-            }
-
-            return RedirectToAction("IndexAsync");
+            
+            return Ok(group.ToModel());
         }
 
-        [HttpGet]
-        [Route("create")]
-        public IActionResult Create()
-        {
-            return View();
-        }
-
+        [HttpPut]
         [HttpPost]
         [Route("")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateReallyAsync(GroupViewModel model, CancellationToken ct)
+        public async Task<IActionResult> AddAsync(GroupModel model, CancellationToken ct)
         {
-            await _groupsService.AddAsync(model.ToServiceModel(), ct);
+            model.Id = 0; //not needed when we move to MediatR
+            var group = await _groupsService.AddAsync(model.ToServiceModel(), ct);
 
-            return RedirectToAction("IndexAsync");
+            return CreatedAtAction(nameof(GetByIdAsync),new { id = group.Id }, group.ToModel());
+        }
+
+        [HttpDelete]
+        [Route("{id}")]
+        public async Task<IActionResult> RemoveAsync(long id, CancellationToken ct)
+        {
+            await _groupsService.RemoveAsync(id, ct);
+
+            return NoContent();
         }
     }
 }
