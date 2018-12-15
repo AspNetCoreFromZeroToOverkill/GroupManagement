@@ -2,15 +2,17 @@
 using CodingMilitia.PlayBall.GroupManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Data.Migrations
 {
     [DbContext(typeof(GroupManagementDbContext))]
-    partial class GroupManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20181215120000_MakeGroupIdColumnIdentityAlways")]
+    partial class MakeGroupIdColumnIdentityAlways
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

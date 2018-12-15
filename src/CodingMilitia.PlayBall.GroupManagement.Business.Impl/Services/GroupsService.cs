@@ -45,5 +45,15 @@ namespace CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services
             await _context.SaveChangesAsync(ct);
             return addedGroupEntry.Entity.ToService();
         }
+
+        public async Task RemoveAsync(long id, CancellationToken ct)
+        {
+            var group = await _context.Groups.SingleOrDefaultAsync(g => g.Id == id, ct);
+            if(group != null)
+            {
+                _context.Remove(group);
+                await _context.SaveChangesAsync(ct);
+            }            
+        }
     }
 }
