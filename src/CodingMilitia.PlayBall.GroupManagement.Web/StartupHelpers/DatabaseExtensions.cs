@@ -11,8 +11,12 @@ namespace Microsoft.AspNetCore.Hosting
         {
             using (var scope = host.Services.CreateScope())
             {
-                var context = scope.ServiceProvider.GetRequiredService<GroupManagementDbContext>();
-                await context.Database.MigrateAsync();
+                var hostingEnvironment = scope.ServiceProvider.GetRequiredService<IHostingEnvironment>();
+                if (hostingEnvironment.IsDevelopment() || hostingEnvironment.IsEnvironment("DockerDevelopment"))
+                {
+                    var context = scope.ServiceProvider.GetService<GroupManagementDbContext>();
+                    await context.Database.MigrateAsync();
+                }
             }
         }
     }
