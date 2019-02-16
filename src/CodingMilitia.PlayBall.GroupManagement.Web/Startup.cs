@@ -43,8 +43,6 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseStaticFiles();
-
             app.Use(async (context, next) =>
             {
                 context.Response.OnStarting(() =>
