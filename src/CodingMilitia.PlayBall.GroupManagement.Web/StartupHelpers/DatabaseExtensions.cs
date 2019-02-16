@@ -7,7 +7,7 @@ namespace Microsoft.AspNetCore.Hosting
 {
     internal static class DatabaseExtensions
     {
-        internal static async Task EnsureDbUpToDate(this IWebHost host)
+        internal static async Task EnsureDbUpToDateAsync(this IWebHost host)
         {
             using (var scope = host.Services.CreateScope())
             {
