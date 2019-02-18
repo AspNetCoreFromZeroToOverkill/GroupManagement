@@ -14,6 +14,7 @@
         <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Business.Impl\CodingMilitia.PlayBall.GroupManagement.Business.Impl.csproj" />
         <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Business\CodingMilitia.PlayBall.GroupManagement.Business.csproj" />
         <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Data\CodingMilitia.PlayBall.GroupManagement.Data.csproj" />
+        <ProjectReference Include="..\CodingMilitia.PlayBall.Shared.StartupTasks\CodingMilitia.PlayBall.Shared.StartupTasks.csproj" />
     </ItemGroup>
 
     <ItemGroup>

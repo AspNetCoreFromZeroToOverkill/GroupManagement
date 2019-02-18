@@ -4,4 +4,12 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="AspNetCore.AsyncInitialization" Version="1.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Data\CodingMilitia.PlayBall.GroupManagement.Data.csproj" />
+  </ItemGroup>
+
 </Project>
