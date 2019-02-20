@@ -1,30 +1,26 @@
 ﻿using AspNetCore.AsyncInitialization;
-using CodingMilitia.PlayBall.GroupManagement.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.Shared.StartupTasks
 {
-    public class DbInitializer : IAsyncInitializer
+    public class DbInitializer<T> where T : DbContext, IAsyncInitializer
     {
-        private IWebHost _host;
-        public DbInitializer(IWebHost host)
+        private IHostingEnvironment _hostingEnvironment;
+        private DbContext _dbContext;
+        public DbInitializer(T dbContext, IHostingEnvironment host)
         {
-            this._host = host;
+            this._hostingEnvironment = host;
+            this._dbContext = dbContext;
         }
 
         public async Task InitializeAsync()
         {
-            using (var scope = _host.Services.CreateScope())
+            //TODO: Pass hardcoded values to the constructor
+            if (_hostingEnvironment.IsDevelopment() || _hostingEnvironment.IsEnvironment("DockerDevelopment")) 
             {
-                var hostingEnvironment = scope.ServiceProvider.GetRequiredService<IHostingEnvironment>();
-                if (hostingEnvironment.IsDevelopment() || hostingEnvironment.IsEnvironment("DockerDevelopment"))
-                {
-                    var context = scope.ServiceProvider.GetService<GroupManagementDbContext>();
-                    await context.Database.MigrateAsync();
-                }
+                await _dbContext.Database.MigrateAsync();
             }
         }
     }
