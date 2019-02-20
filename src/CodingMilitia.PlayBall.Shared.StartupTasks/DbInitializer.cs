@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.Shared.StartupTasks
 {
-    public class DbInitializer<T> where T : DbContext, IAsyncInitializer
+    public class DbInitializer<T> : IAsyncInitializer where T : DbContext
     {
         private IHostingEnvironment _hostingEnvironment;
         private DbContext _dbContext;
