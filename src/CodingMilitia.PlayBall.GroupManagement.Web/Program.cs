@@ -1,10 +1,6 @@
-﻿using System.Threading.Tasks;
-using AspNetCore.AsyncInitialization;
-using CodingMilitia.PlayBall.GroupManagement.Data;
-using CodingMilitia.PlayBall.Shared.StartupTasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
+using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Web
 {
