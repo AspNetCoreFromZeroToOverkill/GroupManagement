@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Data;
+using CodingMilitia.PlayBall.Shared.StartupTasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -31,7 +32,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 options.UseNpgsql(_config.GetConnectionString("GroupManagementDbContext"));
                 options.EnableSensitiveDataLogging();
             });
-
+            services.AddAsyncInitializer<DbInitializer<GroupManagementDbContext>>();
             services.AddBusiness();
         }
 
