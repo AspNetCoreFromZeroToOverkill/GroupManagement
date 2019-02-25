@@ -9,17 +9,18 @@ namespace CodingMilitia.PlayBall.Shared.StartupTasks
     {
         private IHostingEnvironment _hostingEnvironment;
         private DbContext _dbContext;
+        private string _environment;
 
-        public DbInitializer(T dbContext, IHostingEnvironment host)
+        public DbInitializer(T dbContext, IHostingEnvironment host, string environment)
         {
             _hostingEnvironment = host;
             _dbContext = dbContext;
+            _environment = environment;
         }
 
         public async Task InitializeAsync()
         {
-            //TODO: Pass hardcoded values to the constructor - https://github.com/AspNetCoreFromZeroToOverkill/GroupManagement/issues/26
-            if (_hostingEnvironment.IsDevelopment() || _hostingEnvironment.IsEnvironment("DockerDevelopment")) 
+            if (_hostingEnvironment.IsEnvironment(_environment)) 
             {
                 await _dbContext.Database.MigrateAsync();
             }
