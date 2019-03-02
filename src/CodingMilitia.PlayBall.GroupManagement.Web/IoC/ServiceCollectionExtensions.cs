@@ -2,9 +2,7 @@ using System;
 using CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
-using CodingMilitia.PlayBall.Shared.StartupTasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -43,11 +41,6 @@ namespace Microsoft.Extensions.DependencyInjection
             configuration.Bind(config);
             services.AddSingleton(config);
             return config;
-        }
-
-        public static IServiceCollection AddDbInitializer<T> (this IServiceCollection services) where T : DbContext
-        {
-            return services.AddAsyncInitializer<DbInitializer<T>>();
         }
     }
 }
