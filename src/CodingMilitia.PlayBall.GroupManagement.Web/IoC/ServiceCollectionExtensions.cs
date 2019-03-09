@@ -1,8 +1,11 @@
 using System;
+using System.Security.Claims;
 using CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,12 +20,35 @@ namespace Microsoft.Extensions.DependencyInjection
             var mvcBuilder = services.AddMvcCore(options =>
             {
                 options.Filters.AddService<ApiExceptionFilter>();
+                
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("scope", "GroupManagement")
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
             });
+            
             mvcBuilder.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);   
             mvcBuilder.AddJsonFormatters();
+            mvcBuilder.AddAuthorization();
             return services;
         }
 
+        public static IServiceCollection AddConfiguredAuth(this IServiceCollection services)
+        {
+            services
+                .AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "https://localhost:5005";
+                    options.RequireHttpsMetadata = false;
+
+                    options.Audience = "GroupManagement";
+                });
+
+            return services;
+        }
+        
         public static IServiceCollection AddBusiness(this IServiceCollection services)
         {
             services.AddScoped<IGroupsService, GroupsService>();
