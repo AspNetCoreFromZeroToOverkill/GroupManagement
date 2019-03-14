@@ -25,7 +25,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddRequiredMvcComponents();              
+            services
+                .AddRequiredMvcComponents();              
 
             services.AddDbContext<GroupManagementDbContext>(options =>
             {
@@ -34,6 +35,9 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
             });
             services.AddDbInitializer<GroupManagementDbContext>();
             services.AddBusiness();
+
+            services
+                .AddConfiguredAuth();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -55,6 +59,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 await next.Invoke();
             });
 
+            app.UseAuthentication();
             app.UseMvc();
 
             app.Run(async (context) =>
