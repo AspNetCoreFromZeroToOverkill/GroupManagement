@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
-    public static class StaticExtensions
+    public static class ServiceCollectionExtensions
     {
         public static IServiceCollection AddDbInitializer<T> (this IServiceCollection services) where T : DbContext
         {
