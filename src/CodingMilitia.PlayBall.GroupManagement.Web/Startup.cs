@@ -33,7 +33,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 options.UseNpgsql(_config.GetConnectionString("GroupManagementDbContext"));
                 options.EnableSensitiveDataLogging();
             });
-            services.AddAsyncInitializer<DbInitializer<GroupManagementDbContext>>();
+            services.AddDbInitializer<GroupManagementDbContext>();
             services.AddBusiness();
 
             services
