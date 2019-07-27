@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/core/sdk:2.2 AS builder
+FROM mcr.microsoft.com/dotnet/core/sdk:2.2-alpine AS builder
 WORKDIR /app
 
 # Copy solution and restore as distinct layers to cache dependencies
