@@ -2,6 +2,7 @@ using System;
 using System.Security.Claims;
 using CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
+using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -34,15 +35,16 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddConfiguredAuth(this IServiceCollection services)
+        public static IServiceCollection AddConfiguredAuth(this IServiceCollection services, IConfiguration configuration)
         {
             services
                 .AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "https://localhost:5005";
-                    options.RequireHttpsMetadata = false;
+                    var authServiceConfig = configuration.GetSection<AuthServiceSettings>(nameof(AuthServiceSettings));
 
+                    options.Authority = authServiceConfig.Authority;
+                    options.RequireHttpsMetadata = authServiceConfig.RequireHttpsMetadata;
                     options.Audience = "GroupManagement";
                 });
 
