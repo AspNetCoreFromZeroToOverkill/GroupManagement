@@ -1,5 +1,4 @@
 ﻿using CodingMilitia.PlayBall.GroupManagement.Data;
-using CodingMilitia.PlayBall.Shared.StartupTasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -8,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 [assembly: ApiController]
 namespace CodingMilitia.PlayBall.GroupManagement.Web
@@ -33,15 +33,16 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 options.UseNpgsql(_config.GetConnectionString("GroupManagementDbContext"));
                 options.EnableSensitiveDataLogging();
             });
-            services.AddDbInitializer<GroupManagementDbContext>();
+            services.AddDatabaseInitializer<GroupManagementDbContext>();
             services.AddBusiness();
 
             services
-                .AddConfiguredAuth(_config);
+                .AddConfiguredAuthentication(_config)
+                .AddConfiguredAuthorization();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -58,9 +59,17 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
 
                 await next.Invoke();
             });
-
+            
+            app.UseRouting();
             app.UseAuthentication();
-            app.UseMvc();
+            app.UseAuthorization();
+            
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints
+                    .MapControllers()
+                    .RequireAuthorization();
+            });
 
             app.Run(async (context) =>
             {
