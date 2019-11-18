@@ -10,6 +10,9 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
     [Route("groups")]
     public class GroupsController : ControllerBase
     {
+        private static readonly string GetByIdActionName 
+            = nameof(GetByIdAsync).Replace("Async", string.Empty);
+        
         private readonly IGroupsService _groupsService;
 
         public GroupsController(IGroupsService groupsService)
@@ -46,7 +49,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
         {
             model.Id = id; //not needed when we move to MediatR
             var group = await _groupsService.UpdateAsync(model.ToServiceModel(), ct);
-            
+
             return Ok(group.ToModel());
         }
 
@@ -58,7 +61,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Controllers
             model.Id = 0; //not needed when we move to MediatR
             var group = await _groupsService.AddAsync(model.ToServiceModel(), ct);
 
-            return CreatedAtAction(nameof(GetByIdAsync),new { id = group.Id }, group.ToModel());
+            return CreatedAtAction(GetByIdActionName, new {id = group.Id}, group.ToModel());
         }
 
         [HttpDelete]

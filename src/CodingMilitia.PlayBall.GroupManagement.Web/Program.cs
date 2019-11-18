@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Web
 {
@@ -9,12 +10,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
         public static async Task Main(string[] args)
         {
             var host = CreateWebHostBuilder(args).Build();
-            await host.InitAsync();
-            host.Run();
+            await host.RunAsync();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        private static IHostBuilder CreateWebHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webBuilder =>
+                {
+                    webBuilder.UseStartup<Startup>();
+                });
     }
 }
