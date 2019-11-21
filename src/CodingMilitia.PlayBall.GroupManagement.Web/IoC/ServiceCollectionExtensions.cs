@@ -1,14 +1,10 @@
 using System;
-using System.Security.Claims;
 using CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services;
 using CodingMilitia.PlayBall.GroupManagement.Business.Services;
 using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -18,24 +14,16 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<ApiExceptionFilter>();
 
-            var mvcBuilder = services.AddMvcCore(options =>
+            services.AddControllers(options =>
             {
                 options.Filters.AddService<ApiExceptionFilter>();
-                
-                var policy = new AuthorizationPolicyBuilder()
-                    .RequireAuthenticatedUser()
-                    .RequireClaim("scope", "GroupManagement")
-                    .Build();
-                options.Filters.Add(new AuthorizeFilter(policy));
             });
-            
-            mvcBuilder.SetCompatibilityVersion(CompatibilityVersion.Version_2_2);   
-            mvcBuilder.AddJsonFormatters();
-            mvcBuilder.AddAuthorization();
+           
             return services;
         }
 
-        public static IServiceCollection AddConfiguredAuth(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddConfiguredAuthentication(this IServiceCollection services,
+            IConfiguration configuration)
         {
             services
                 .AddAuthentication("Bearer")
@@ -50,21 +38,37 @@ namespace Microsoft.Extensions.DependencyInjection
 
             return services;
         }
-        
-        public static IServiceCollection AddBusiness(this IServiceCollection services)
+
+        public static IServiceCollection AddConfiguredAuthorization(this IServiceCollection services)
         {
-            services.AddScoped<IGroupsService, GroupsService>();
-            
-            //more business services...
+            services.AddAuthorization(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .RequireClaim("scope", "GroupManagement")
+                    .Build();
+                
+                options.DefaultPolicy = policy;
+            });
 
             return services;
         }
         
-        public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration) where TConfig : class, new()
+        public static IServiceCollection AddBusiness(this IServiceCollection services)
+        {
+            services.AddScoped<IGroupsService, GroupsService>();
+
+            //more business services...
+
+            return services;
+        }
+
+        public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)
+            where TConfig : class, new()
         {
             if (services == null) throw new ArgumentNullException(nameof(services));
             if (configuration == null) throw new ArgumentNullException(nameof(configuration));
- 
+
             var config = new TConfig();
             configuration.Bind(config);
             services.AddSingleton(config);
