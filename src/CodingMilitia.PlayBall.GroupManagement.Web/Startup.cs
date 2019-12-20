@@ -1,12 +1,11 @@
-﻿using CodingMilitia.PlayBall.GroupManagement.Data;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Threading.Tasks;
+using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data;
 using Microsoft.Extensions.Hosting;
 
 [assembly: ApiController]
@@ -33,12 +32,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
                 options.UseNpgsql(_config.GetConnectionString("GroupManagementDbContext"));
                 options.EnableSensitiveDataLogging();
             });
-            services.AddDatabaseInitializer<GroupManagementDbContext>();
-            services.AddBusiness();
-
+            
             services
+                .AddDatabaseInitializer<GroupManagementDbContext>()
+                .AddBusiness()
+                .AddInfrastructure()
                 .AddConfiguredAuthentication(_config)
-                .AddConfiguredAuthorization();
+                .AddConfiguredAuthorization()
+                .AddHttpContextAccessor();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

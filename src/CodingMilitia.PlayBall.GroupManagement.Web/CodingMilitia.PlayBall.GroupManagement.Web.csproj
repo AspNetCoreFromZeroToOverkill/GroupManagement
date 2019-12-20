@@ -1,19 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.0</TargetFramework>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <UserSecretsId>A1CD619E-A374-4208-888B-42F3DC489F14</UserSecretsId>
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.0.1">
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="Scrutor" Version="3.1.0" />
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Business.Impl\CodingMilitia.PlayBall.GroupManagement.Business.Impl.csproj" />
-        <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Business\CodingMilitia.PlayBall.GroupManagement.Business.csproj" />
-        <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Data\CodingMilitia.PlayBall.GroupManagement.Data.csproj" />
+        <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Domain\CodingMilitia.PlayBall.GroupManagement.Domain.csproj" />
+        <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Infrastructure\CodingMilitia.PlayBall.GroupManagement.Infrastructure.csproj" />
         <ProjectReference Include="..\CodingMilitia.PlayBall.Shared.StartupTasks\CodingMilitia.PlayBall.Shared.StartupTasks.csproj" />
     </ItemGroup>
 

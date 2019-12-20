@@ -1,11 +1,14 @@
 using System;
-using CodingMilitia.PlayBall.GroupManagement.Business.Impl.Services;
-using CodingMilitia.PlayBall.GroupManagement.Business.Services;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
+using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data;
 using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
+using CodingMilitia.PlayBall.GroupManagement.Web.Services;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
 
+// ReSharper disable once CheckNamespace - for better discoverability
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
@@ -14,11 +17,8 @@ namespace Microsoft.Extensions.DependencyInjection
         {
             services.AddTransient<ApiExceptionFilter>();
 
-            services.AddControllers(options =>
-            {
-                options.Filters.AddService<ApiExceptionFilter>();
-            });
-           
+            services.AddControllers(options => { options.Filters.AddService<ApiExceptionFilter>(); });
+
             return services;
         }
 
@@ -47,19 +47,44 @@ namespace Microsoft.Extensions.DependencyInjection
                     .RequireAuthenticatedUser()
                     .RequireClaim("scope", "GroupManagement")
                     .Build();
-                
+
                 options.DefaultPolicy = policy;
             });
 
             return services;
         }
-        
+
         public static IServiceCollection AddBusiness(this IServiceCollection services)
         {
-            services.AddScoped<IGroupsService, GroupsService>();
+            services.AddMediatR(
+                typeof(CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups.GetUserGroupsQuery));
 
-            //more business services...
+            return services;
+        }
 
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        {
+            services.AddSingleton<ICurrentUserAccessor, CurrentUserAccessor>();
+
+            services.Scan(scan =>
+                scan
+                    .FromAssembliesOf(typeof(GroupManagementDbContext))
+                    .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
+                    .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
+                );
+            
+            // without Scrutor (or an alternative) we'd need to do everything by hand, like:
+            /*
+                services.AddScoped<IRepository<Group, long>, EfRepository<Group, long>>();
+                services.AddScoped<IRepository<User, string>, EfRepository<User, string>>();
+                services.AddScoped<IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>>, UserGroupsQueryHandler>();
+                services.AddScoped<IQueryHandler<UserGroupQuery, Group>, UserGroupQueryHandler>();
+                // ...
+            */
             return services;
         }
 
