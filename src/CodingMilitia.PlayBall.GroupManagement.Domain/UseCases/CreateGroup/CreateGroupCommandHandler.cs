@@ -22,20 +22,15 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
                 userByIdQueryHandler ?? throw new ArgumentNullException(nameof(userByIdQueryHandler));
         }
 
-        public async Task<CreateGroupCommandResult> Handle(CreateGroupCommand request,
+        public async Task<CreateGroupCommandResult> Handle(
+            CreateGroupCommand request,
             CancellationToken cancellationToken)
         {
             var currentUser = await _userByIdQueryHandler.HandleAsync(
                 new UserByIdQuery(request.UserId),
                 cancellationToken);
             
-            var group = new Group
-            {
-                Name = request.Name,
-                Creator = currentUser
-            };
-
-            group.GroupUsers.Add(new GroupUser {User = currentUser, Role = GroupUserRole.Admin});
+            var group = new Group(request.Name, currentUser);
 
             var addedGroup = await _groupsRepository.AddAsync(group, cancellationToken);
 

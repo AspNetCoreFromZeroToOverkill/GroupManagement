@@ -29,8 +29,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 
-            if (group is object
-                && group.GroupUsers.Any(gu => gu.User.Id == request.UserId && gu.Role == GroupUserRole.Admin))
+            if (group is object && group.IsAdmin(request.UserId))
             {
                 await _groupsRepository.DeleteAsync(group, cancellationToken);
             }
