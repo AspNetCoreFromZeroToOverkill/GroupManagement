@@ -10,11 +10,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
 {
     public sealed class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, CreateGroupCommandResult>
     {
-        private readonly IRepository<Group> _groupsRepository;
+        private readonly IVersionedRepository<Group, uint>  _groupsRepository;
         private readonly IQueryHandler<UserByIdQuery, User> _userByIdQueryHandler;
 
         public CreateGroupCommandHandler(
-            IRepository<Group> groupsRepository,
+            IVersionedRepository<Group, uint>  groupsRepository,
             IQueryHandler<UserByIdQuery, User> userByIdQueryHandler)
         {
             _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));

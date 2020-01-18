@@ -65,11 +65,14 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
             services.AddSingleton<ICurrentUserAccessor, CurrentUserAccessor>();
-
+            services.AddScoped(typeof(EfRepository<>));
             services.Scan(scan =>
                 scan
                     .FromAssembliesOf(typeof(GroupManagementDbContext))
                     .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
+                    .AddClasses(classes => classes.AssignableTo(typeof(IVersionedRepository<,>)))
                         .AsImplementedInterfaces()
                         .WithScopedLifetime()
                     .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
