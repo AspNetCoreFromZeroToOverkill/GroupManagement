@@ -20,8 +20,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Configurati
 
             builder
                 .HasMany(e => e.GroupUsers)
-                .WithOne(e => e.Group)
-                .HasForeignKey("GroupId");
+                .WithOne()
+                .HasForeignKey(e => e.GroupId);
 
             builder
                 .Property(e => e.RowVersion)

@@ -8,14 +8,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Configurati
     {
         public void Configure(EntityTypeBuilder<GroupUser> builder)
         {
-//            builder.HasKey(e =>
-//                new
-//                {
-//                    e.GroupId,
-//                    e.UserId
-//                });
-
-            builder.HasKey("GroupId", "UserId");
+            builder.HasKey(e =>
+                new
+                {
+                    e.GroupId,
+                    e.UserId
+                });
         }
     }
 }
