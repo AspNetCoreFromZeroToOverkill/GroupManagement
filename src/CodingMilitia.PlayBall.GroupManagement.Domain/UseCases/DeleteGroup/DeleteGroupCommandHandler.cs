@@ -12,11 +12,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
     public class DeleteGroupCommandHandler : IRequestHandler<DeleteGroupCommand, Unit>
     {
         private readonly IQueryHandler<UserGroupQuery, Group> _userGroupQueryHandler;
-        private readonly IRepository<Group> _groupsRepository;
+        private readonly IVersionedRepository<Group, uint>  _groupsRepository;
 
         public DeleteGroupCommandHandler(
             IQueryHandler<UserGroupQuery, Group> userGroupQueryHandler,
-            IRepository<Group> groupsRepository)
+            IVersionedRepository<Group, uint>  groupsRepository)
         {
             _userGroupQueryHandler =
                 userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));

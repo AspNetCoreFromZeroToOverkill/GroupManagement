@@ -1,7 +1,7 @@
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Data
 {
-    public interface IVersionedEntity
+    public interface IVersionedEntity<TVersion>
     {
-        uint RowVersion { get; }
+        TVersion RowVersion { get; }
     }
 }

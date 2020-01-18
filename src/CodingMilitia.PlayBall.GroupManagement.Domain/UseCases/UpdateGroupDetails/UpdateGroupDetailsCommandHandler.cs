@@ -14,14 +14,15 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
     {
         private readonly IQueryHandler<UserByIdQuery, User> _userByIdQueryHandler;
         private readonly IQueryHandler<UserGroupQuery, Group> _userGroupQueryHandler;
-        private readonly IRepository<Group> _groupsRepository;
+        private readonly IVersionedRepository<Group, uint> _groupsRepository;
 
         public UpdateGroupDetailsCommandHandler(
             IQueryHandler<UserByIdQuery, User> userByIdQueryHandler,
             IQueryHandler<UserGroupQuery, Group> userGroupQueryHandler,
-            IRepository<Group> groupsRepository)
+            IVersionedRepository<Group, uint> groupsRepository)
         {
-            _userByIdQueryHandler = userByIdQueryHandler;
+            _userByIdQueryHandler =
+                userByIdQueryHandler ?? throw new ArgumentNullException(nameof(userByIdQueryHandler));
             _userGroupQueryHandler =
                 userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));
             _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
@@ -31,10 +32,6 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             UpdateGroupDetailsCommand request,
             CancellationToken cancellationToken)
         {
-            var currentUser = await _userByIdQueryHandler.HandleAsync(
-                new UserByIdQuery(request.UserId),
-                cancellationToken);
-            
             var group = await _userGroupQueryHandler.HandleAsync(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
@@ -44,15 +41,16 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
                 return null;
             }
 
+            var currentUser = await _userByIdQueryHandler.HandleAsync(
+                new UserByIdQuery(request.UserId),
+                cancellationToken);
+
             group.Rename(currentUser, request.Name);
 
-            //TODO: think of a strategy to take care of row version stuff
-            group.RowVersion = uint.Parse(request.RowVersion);
-            
-            await _groupsRepository.UpdateAsync(group, cancellationToken);
+            await _groupsRepository.UpdateAsync(group, uint.Parse(request.RowVersion), cancellationToken);
 
             return new UpdateGroupDetailsCommandResult(
-                group.Id, 
+                group.Id,
                 group.Name,
                 group.RowVersion.ToString());
         }

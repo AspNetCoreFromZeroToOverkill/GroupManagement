@@ -5,7 +5,7 @@ using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Entities
 {
-    public class Group : IVersionedEntity
+    public class Group : IVersionedEntity<uint>
     {
         private readonly List<GroupUser> _groupUsers = new List<GroupUser>();
 
@@ -22,7 +22,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Entities
 
         public long Id { get; private set; }
         public string Name { get; private set; }
-        public uint RowVersion { get; set; } //TODO: make setter private
+        public uint RowVersion { get; private set; }
         public User Creator { get; private set; }
         public IReadOnlyCollection<GroupUser> GroupUsers => _groupUsers.AsReadOnly();
 
