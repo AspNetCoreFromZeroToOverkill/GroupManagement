@@ -5,18 +5,19 @@ using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Entities;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
 {
     public class DeleteGroupCommandHandler : IRequestHandler<DeleteGroupCommand, Unit>
     {
-        private readonly IQueryHandler<UserGroupQuery, Group> _userGroupQueryHandler;
-        private readonly IVersionedRepository<Group, uint>  _groupsRepository;
+        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
+        private readonly IVersionedRepository<Group, uint> _groupsRepository;
 
         public DeleteGroupCommandHandler(
-            IQueryHandler<UserGroupQuery, Group> userGroupQueryHandler,
-            IVersionedRepository<Group, uint>  groupsRepository)
+            IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler,
+            IVersionedRepository<Group, uint> groupsRepository)
         {
             _userGroupQueryHandler =
                 userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));
@@ -25,14 +26,17 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
 
         public async Task<Unit> Handle(DeleteGroupCommand request, CancellationToken cancellationToken)
         {
-            var group = await _userGroupQueryHandler.HandleAsync(
+            var maybeGroup = await _userGroupQueryHandler.HandleAsync(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 
-            if (group is object && group.IsAdmin(request.UserId))
+            await maybeGroup.MatchSomeAsync(async group =>
             {
-                await _groupsRepository.DeleteAsync(group, cancellationToken);
-            }
+                if (group.IsAdmin(request.UserId))
+                {
+                    await _groupsRepository.DeleteAsync(group, cancellationToken);
+                }
+            });
 
             return Unit.Value;
         }
