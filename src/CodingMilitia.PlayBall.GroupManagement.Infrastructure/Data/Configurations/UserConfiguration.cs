@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Configurations
 {
-    public class UserConfiguration: IEntityTypeConfiguration<User>
+    public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
@@ -12,8 +12,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Configurati
 
             builder
                 .HasMany(e => e.UserGroups)
-                .WithOne(e => e.User)
-                .HasForeignKey("UserId");
+                .WithOne()
+                .HasForeignKey(e => e.UserId);
         }
     }
 }

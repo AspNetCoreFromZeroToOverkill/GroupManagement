@@ -22,7 +22,6 @@ namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries
                 .Groups
                 .Include(g => g.Creator)
                 .Include(g => g.GroupUsers)
-                .ThenInclude(g => g.User)
-                .SingleOrDefaultAsync(g => g.Id == query.GroupId && g.GroupUsers.Any(gu => gu.User.Id == query.UserId), ct);
+                .SingleOrDefaultAsync(g => g.Id == query.GroupId && g.GroupUsers.Any(gu => gu.UserId == query.UserId), ct);
     }
 }

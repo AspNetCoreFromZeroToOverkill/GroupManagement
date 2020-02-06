@@ -10,11 +10,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
 {
     public sealed class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, CreateGroupCommandResult>
     {
-        private readonly IRepository<Group> _groupsRepository;
+        private readonly IVersionedRepository<Group, uint>  _groupsRepository;
         private readonly IQueryHandler<UserByIdQuery, User> _userByIdQueryHandler;
 
         public CreateGroupCommandHandler(
-            IRepository<Group> groupsRepository,
+            IVersionedRepository<Group, uint>  groupsRepository,
             IQueryHandler<UserByIdQuery, User> userByIdQueryHandler)
         {
             _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
@@ -22,20 +22,15 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
                 userByIdQueryHandler ?? throw new ArgumentNullException(nameof(userByIdQueryHandler));
         }
 
-        public async Task<CreateGroupCommandResult> Handle(CreateGroupCommand request,
+        public async Task<CreateGroupCommandResult> Handle(
+            CreateGroupCommand request,
             CancellationToken cancellationToken)
         {
             var currentUser = await _userByIdQueryHandler.HandleAsync(
                 new UserByIdQuery(request.UserId),
                 cancellationToken);
             
-            var group = new Group
-            {
-                Name = request.Name,
-                Creator = currentUser
-            };
-
-            group.GroupUsers.Add(new GroupUser {User = currentUser, Role = GroupUserRole.Admin});
+            var group = new Group(request.Name, currentUser);
 
             var addedGroup = await _groupsRepository.AddAsync(group, cancellationToken);
 

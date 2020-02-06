@@ -22,7 +22,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries
             => (await _db
                 .Groups
                 .Include(g => g.Creator)
-                .Where(g => g.GroupUsers.Any(gu => gu.User.Id == query.UserId))
+                .Where(g => g.GroupUsers.Any(gu => gu.UserId == query.UserId))
                 .ToListAsync(ct))
                 .AsReadOnly();
     }

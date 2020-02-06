@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Configurations
 {
-    public class PlayerConfiguration: IEntityTypeConfiguration<Player>
+    public class PlayerConfiguration : IEntityTypeConfiguration<Player>
     {
         public void Configure(EntityTypeBuilder<Player> builder)
         {
