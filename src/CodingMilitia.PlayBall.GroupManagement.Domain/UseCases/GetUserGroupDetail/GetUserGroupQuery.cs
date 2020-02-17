@@ -1,8 +1,9 @@
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDetail
 {
-    public sealed class GetUserGroupQuery : IRequest<GetUserGroupQueryResult>
+    public sealed class GetUserGroupQuery : IRequest<Optional<GetUserGroupQueryResult>>
     {
         public GetUserGroupQuery(string userId, long groupId)
         {
