@@ -4,40 +4,37 @@ using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Entities;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDetail
 {
-    public sealed class GetUserGroupQueryHandler : IRequestHandler<GetUserGroupQuery, GetUserGroupQueryResult>
+    public sealed class GetUserGroupQueryHandler : IRequestHandler<GetUserGroupQuery, Optional<GetUserGroupQueryResult>>
     {
-        private readonly IQueryHandler<UserGroupQuery, Group> _userGroupQueryHandler;
+        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
 
 
-        public GetUserGroupQueryHandler(IQueryHandler<UserGroupQuery, Group> userGroupQueryHandler)
+        public GetUserGroupQueryHandler(IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler)
         {
             _userGroupQueryHandler =
                 userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));
         }
 
 
-        public async Task<GetUserGroupQueryResult> Handle(
+        public async Task<Optional<GetUserGroupQueryResult>> Handle(
             GetUserGroupQuery request,
             CancellationToken cancellationToken)
         {
-            var group = await _userGroupQueryHandler.HandleAsync(
+            var maybeGroup = await _userGroupQueryHandler.HandleAsync(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 
-            if (group is null)
-            {
-                return null;
-            }
-            
-            return new GetUserGroupQueryResult(
-                group.Id,
-                group.Name,
-                group.RowVersion.ToString(),
-                new GetUserGroupQueryResult.User(group.Creator.Id, group.Creator.Name));
+            return maybeGroup.Map(
+                group => new GetUserGroupQueryResult(
+                    group.Id,
+                    group.Name,
+                    group.RowVersion.ToString(),
+                    new GetUserGroupQueryResult.User(group.Creator.Id, group.Creator.Name)));
         }
     }
 }

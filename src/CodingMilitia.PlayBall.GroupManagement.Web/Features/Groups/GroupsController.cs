@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup;
 using CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup;
 using CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDetail;
@@ -37,16 +38,13 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<IActionResult> GetByIdAsync(long id, CancellationToken ct)
+        public async Task<ActionResult<GetUserGroupQueryResult>> GetByIdAsync(long id, CancellationToken ct)
         {
             var result = await _mediator.Send(new GetUserGroupQuery(_currentUserAccessor.Id, id));
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return Ok(result);
+            return result.MapValueOr<GetUserGroupQueryResult, ActionResult<GetUserGroupQueryResult>>(
+                r => r,
+                () => NotFound());
         }
 
         [HttpPut]
@@ -62,12 +60,9 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
                 model.Name,
                 model.RowVersion));
 
-            if (result is null)
-            {
-                return NotFound();
-            }
-
-            return result;
+            return result.MapValueOr<UpdateGroupDetailsCommandResult, ActionResult<UpdateGroupDetailsCommandResult>>(
+                r => r,
+                () => NotFound());
         }
 
         [HttpPut]

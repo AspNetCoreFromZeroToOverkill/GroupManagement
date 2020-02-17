@@ -1,8 +1,9 @@
 using CodingMilitia.PlayBall.GroupManagement.Domain.Entities;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Data.Queries
 {
-    public class UserGroupQuery : IQuery<Group>
+    public class UserGroupQuery : IQuery<Optional<Group>>
     {
         public UserGroupQuery(string userId, long groupId)
         {

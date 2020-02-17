@@ -1,8 +1,9 @@
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDetails
 {
-    public sealed class UpdateGroupDetailsCommand : IRequest<UpdateGroupDetailsCommandResult>
+    public sealed class UpdateGroupDetailsCommand : IRequest<Optional<UpdateGroupDetailsCommandResult>>
     {
         public UpdateGroupDetailsCommand(string userId, long groupId, string name, string rowVersion)
         {
