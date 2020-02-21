@@ -9,7 +9,7 @@ using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDetail
 {
-    public sealed class GetUserGroupQueryHandler : IRequestHandler<GetUserGroupQuery, Optional<GetUserGroupQueryResult>>
+    public sealed class GetUserGroupQueryHandler : IRequestHandler<GetUserGroupQuery, Either<Error, GetUserGroupQueryResult>>
     {
         private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
 
@@ -21,7 +21,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDet
         }
 
 
-        public async Task<Optional<GetUserGroupQueryResult>> Handle(
+        public async Task<Either<Error, GetUserGroupQueryResult>> Handle(
             GetUserGroupQuery request,
             CancellationToken cancellationToken)
         {
@@ -29,12 +29,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDet
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 
-            return maybeGroup.Map(
-                group => new GetUserGroupQueryResult(
+            return maybeGroup.MapValueOr(
+                group => Result.Success(new GetUserGroupQueryResult(
                     group.Id,
                     group.Name,
                     group.RowVersion.ToString(),
-                    new GetUserGroupQueryResult.User(group.Creator.Id, group.Creator.Name)));
+                    new GetUserGroupQueryResult.User(group.Creator.Id, group.Creator.Name))),
+                () => Result.NotFound<GetUserGroupQueryResult>(
+                    $"Group with id {request.GroupId} not found."));
         }
     }
 }

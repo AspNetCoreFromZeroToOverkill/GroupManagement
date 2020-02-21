@@ -1,5 +1,3 @@
-using System;
-
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 {
     // Simple implementation

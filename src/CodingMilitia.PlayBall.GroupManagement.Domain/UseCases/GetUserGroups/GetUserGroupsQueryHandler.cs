@@ -20,7 +20,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
             _userGroupsQueryHandler = userGroupsQueryHandler?? throw new ArgumentNullException(nameof(userGroupsQueryHandler));
         }
 
-        public async Task<GetUserGroupsQueryResult> Handle(GetUserGroupsQuery request,
+        public async Task<GetUserGroupsQueryResult> Handle(
+            GetUserGroupsQuery request,
             CancellationToken cancellationToken)
         {
             var groups = await _userGroupsQueryHandler.HandleAsync(

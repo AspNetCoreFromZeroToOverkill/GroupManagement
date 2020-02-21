@@ -11,7 +11,7 @@ using MediatR;
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDetails
 {
     public sealed class UpdateGroupDetailsCommandHandler
-        : IRequestHandler<UpdateGroupDetailsCommand, Optional<UpdateGroupDetailsCommandResult>>
+        : IRequestHandler<UpdateGroupDetailsCommand, Either<Error, UpdateGroupDetailsCommandResult>>
     {
         private readonly IQueryHandler<UserByIdQuery, Optional<User>> _userByIdQueryHandler;
         private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
@@ -29,7 +29,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
         }
 
-        public async Task<Optional<UpdateGroupDetailsCommandResult>> Handle(
+        public async Task<Either<Error, UpdateGroupDetailsCommandResult>> Handle(
             UpdateGroupDetailsCommand request,
             CancellationToken cancellationToken)
         {
@@ -39,7 +39,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
 
             if (!maybeGroup.TryGetValue(out var group))
             {
-                return Optional.None<UpdateGroupDetailsCommandResult>();
+                return Result.NotFound<UpdateGroupDetailsCommandResult>(
+                    $"Group with id {request.GroupId} not found.");
             }
 
             var maybeUser = await _userByIdQueryHandler.HandleAsync(
@@ -48,18 +49,24 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
 
             if (!maybeUser.TryGetValue(out var currentUser))
             {
-                // TODO: we'll get rid of these exceptions in the next episode
-                throw new InvalidOperationException("Invalid user to create a group.");
+                return Result.Invalid<UpdateGroupDetailsCommandResult>(
+                    "Invalid user to create a group.");
             }
 
-            group.Rename(currentUser, request.Name);
+            return await group
+                .Rename(currentUser, request.Name)
+                .MapAsync(async _ =>
+            {
+                await _groupsRepository.UpdateAsync(
+                    group,
+                    uint.Parse(request.RowVersion),
+                    cancellationToken);
 
-            await _groupsRepository.UpdateAsync(group, uint.Parse(request.RowVersion), cancellationToken);
-
-            return Optional.Some(new UpdateGroupDetailsCommandResult(
-                group.Id,
-                group.Name,
-                group.RowVersion.ToString()));
+                return new UpdateGroupDetailsCommandResult(
+                    group.Id,
+                    group.Name,
+                    group.RowVersion.ToString());
+            });
         }
     }
 }

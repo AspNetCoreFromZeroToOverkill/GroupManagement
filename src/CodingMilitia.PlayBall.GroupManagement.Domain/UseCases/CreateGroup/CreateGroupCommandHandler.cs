@@ -9,13 +9,14 @@ using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
 {
-    public sealed class CreateGroupCommandHandler : IRequestHandler<CreateGroupCommand, CreateGroupCommandResult>
+    public sealed class CreateGroupCommandHandler
+        : IRequestHandler<CreateGroupCommand, Either<Error, CreateGroupCommandResult>>
     {
-        private readonly IVersionedRepository<Group, uint>  _groupsRepository;
+        private readonly IVersionedRepository<Group, uint> _groupsRepository;
         private readonly IQueryHandler<UserByIdQuery, Optional<User>> _userByIdQueryHandler;
 
         public CreateGroupCommandHandler(
-            IVersionedRepository<Group, uint>  groupsRepository,
+            IVersionedRepository<Group, uint> groupsRepository,
             IQueryHandler<UserByIdQuery, Optional<User>> userByIdQueryHandler)
         {
             _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
@@ -23,7 +24,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
                 userByIdQueryHandler ?? throw new ArgumentNullException(nameof(userByIdQueryHandler));
         }
 
-        public async Task<CreateGroupCommandResult> Handle(
+        public async Task<Either<Error, CreateGroupCommandResult>> Handle(
             CreateGroupCommand request,
             CancellationToken cancellationToken)
         {
@@ -33,21 +34,20 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
 
             if (!maybeUser.TryGetValue(out var currentUser))
             {
-                // TODO: we'll get rid of these exceptions in the next episode
-                throw new InvalidOperationException("Invalid user to create a group.");
+                return Result.Invalid<CreateGroupCommandResult>("Invalid user to create a group.");
             }
-            
+
             var group = new Group(request.Name, currentUser);
 
             var addedGroup = await _groupsRepository.AddAsync(group, cancellationToken);
 
-            return new CreateGroupCommandResult(
+            return Result.Success(new CreateGroupCommandResult(
                 addedGroup.Id,
                 addedGroup.Name,
                 addedGroup.RowVersion.ToString(),
                 new CreateGroupCommandResult.User(
                     currentUser.Id,
-                    currentUser.Name));
+                    currentUser.Name)));
         }
     }
 }
