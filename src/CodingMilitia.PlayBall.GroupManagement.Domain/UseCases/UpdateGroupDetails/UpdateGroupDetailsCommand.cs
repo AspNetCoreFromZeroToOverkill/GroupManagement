@@ -3,7 +3,7 @@ using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDetails
 {
-    public sealed class UpdateGroupDetailsCommand : IRequest<Optional<UpdateGroupDetailsCommandResult>>
+    public sealed class UpdateGroupDetailsCommand : IRequest<Either<Error, UpdateGroupDetailsCommandResult>>
     {
         public UpdateGroupDetailsCommand(string userId, long groupId, string name, string rowVersion)
         {

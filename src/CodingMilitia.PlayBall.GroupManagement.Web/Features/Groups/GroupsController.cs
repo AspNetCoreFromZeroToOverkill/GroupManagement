@@ -42,9 +42,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
         {
             var result = await _mediator.Send(new GetUserGroupQuery(_currentUserAccessor.Id, id));
 
-            return result.MapValueOr<GetUserGroupQueryResult, ActionResult<GetUserGroupQueryResult>>(
-                r => r,
-                () => NotFound());
+            return result.ToActionResult();
         }
 
         [HttpPut]
@@ -60,9 +58,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
                 model.Name,
                 model.RowVersion));
 
-            return result.MapValueOr<UpdateGroupDetailsCommandResult, ActionResult<UpdateGroupDetailsCommandResult>>(
-                r => r,
-                () => NotFound());
+            return result.ToActionResult();
         }
 
         [HttpPut]
@@ -73,7 +69,10 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
             CancellationToken ct)
         {
             var result = await _mediator.Send(new CreateGroupCommand(_currentUserAccessor.Id, model.Name));
-            return CreatedAtAction(GetByIdActionName, new {id = result.Id}, result);
+            
+            return result is Either<Error, CreateGroupCommandResult>.Right success
+                ? CreatedAtAction(GetByIdActionName, new {id = success.Value.Id}, result)
+                : result.ToActionResult();
         }
 
         [HttpDelete]

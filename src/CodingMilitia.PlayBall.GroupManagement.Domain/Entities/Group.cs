@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
+using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Entities
 {
@@ -26,24 +28,24 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Entities
         public User Creator { get; private set; }
         public IReadOnlyCollection<GroupUser> GroupUsers => _groupUsers.AsReadOnly();
 
-        public void Rename(User editingUser, string newName)
+        public Either<Error, Unit> Rename(User editingUser, string newName)
         {
-            ThrowIfNotAdmin(editingUser.Id);
+            if (!IsAdmin(editingUser.Id))
+            {
+                return Result.Unauthorized<Unit>("User is not authorized to edit this group");
+            }
+            
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+                return Result.Invalid<Unit>("The group's name cannot be empty.");
+            }
 
-            Name = !string.IsNullOrWhiteSpace(newName) ? newName : throw new ArgumentNullException(nameof(newName));
+            Name = newName;
+
+            return Result.Success(Unit.Value);
         }
 
         public bool IsAdmin(string userId)
             => GroupUsers.Any(gu => gu.UserId == userId && gu.Role == GroupUserRole.Admin);
-
-        // TODO: temporary we'll get rid of all these exceptions eventually
-        private void ThrowIfNotAdmin(string userId)
-        {
-            if (!IsAdmin(userId))
-            {
-                // TODO: use a better error strategy
-                throw new UnauthorizedAccessException("User is not authorized to edit this group");
-            }
-        }
     }
 }
