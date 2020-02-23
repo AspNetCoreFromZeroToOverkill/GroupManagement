@@ -2,13 +2,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 {
     public abstract class Error
     {
-        private Error(string message)
-        {
-            Message = message;
-        }
-
-        public string Message { get; }
-
+        private Error() { }
 
         public abstract TResult Accept<TVisitor, TResult>(TVisitor visitor)
             where TVisitor : IErrorVisitor<TResult>;
@@ -24,9 +18,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public sealed class NotFound : Error
         {
-            public NotFound(string message) : base(message)
+            public NotFound(string message)
             {
+                Message = message;
             }
+            
+            public string Message { get; }
 
             public override TResult Accept<TVisitor, TResult>(TVisitor visitor)
                 => visitor.Visit(this);
@@ -34,9 +31,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public sealed class Invalid : Error
         {
-            public Invalid(string message) : base(message)
+            public Invalid(string message)
             {
+                Message = message;
             }
+            
+            public string Message { get; }
 
             public override TResult Accept<TVisitor, TResult>(TVisitor visitor)
                 => visitor.Visit(this);
@@ -44,9 +44,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public sealed class Unauthorized : Error
         {
-            public Unauthorized(string message) : base(message)
+            public Unauthorized(string message)
             {
+                Message = message;
             }
+            
+            public string Message { get; }
 
             public override TResult Accept<TVisitor, TResult>(TVisitor visitor)
                 => visitor.Visit(this);
