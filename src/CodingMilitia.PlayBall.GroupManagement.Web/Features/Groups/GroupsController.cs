@@ -15,11 +15,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
     [Route("groups")]
     public class GroupsController : ControllerBase
     {
-        private readonly IMediator _mediator;
-        private readonly ICurrentUserAccessor _currentUserAccessor;
-
         private static readonly string GetByIdActionName
             = nameof(GetByIdAsync).Replace("Async", string.Empty);
+
+        private readonly ICurrentUserAccessor _currentUserAccessor;
+        private readonly IMediator _mediator;
 
         public GroupsController(IMediator mediator, ICurrentUserAccessor currentUserAccessor)
         {
@@ -31,7 +31,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
         [Route("")]
         public async Task<IActionResult> GetAllAsync(CancellationToken ct)
         {
-            var result = await _mediator.Send(new GetUserGroupsQuery(_currentUserAccessor.Id));
+            var result = await _mediator.Send(new GetUserGroupsQuery(_currentUserAccessor.Id), ct);
             return Ok(result.Groups);
         }
 
@@ -40,7 +40,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
         [Route("{id}")]
         public async Task<ActionResult<GetUserGroupQueryResult>> GetByIdAsync(long id, CancellationToken ct)
         {
-            var result = await _mediator.Send(new GetUserGroupQuery(_currentUserAccessor.Id, id));
+            var result = await _mediator.Send(new GetUserGroupQuery(_currentUserAccessor.Id, id), ct);
 
             return result.ToActionResult();
         }
@@ -52,11 +52,13 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
             UpdateGroupDetailsCommandModel model,
             CancellationToken ct)
         {
-            var result = await _mediator.Send(new UpdateGroupDetailsCommand(
-                _currentUserAccessor.Id,
-                id,
-                model.Name,
-                model.RowVersion));
+            var result = await _mediator.Send(
+                new UpdateGroupDetailsCommand(
+                    _currentUserAccessor.Id,
+                    id,
+                    model.Name,
+                    model.RowVersion),
+                ct);
 
             return result.ToActionResult();
         }
@@ -68,18 +70,17 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
             CreateGroupCommandModel model,
             CancellationToken ct)
         {
-            var result = await _mediator.Send(new CreateGroupCommand(_currentUserAccessor.Id, model.Name));
-            
-            return result is Either<Error, CreateGroupCommandResult>.Right success
-                ? CreatedAtAction(GetByIdActionName, new {id = success.Value.Id}, result)
-                : result.ToActionResult();
+            var result = await _mediator.Send(new CreateGroupCommand(_currentUserAccessor.Id, model.Name), ct);
+
+            return result.ToUntypedActionResult(
+                success => CreatedAtAction(GetByIdActionName, new {id = success.Id}, result));
         }
 
         [HttpDelete]
         [Route("{id}")]
         public async Task<IActionResult> RemoveAsync(long id, CancellationToken ct)
         {
-            await _mediator.Send(new DeleteGroupCommand(_currentUserAccessor.Id, id));
+            await _mediator.Send(new DeleteGroupCommand(_currentUserAccessor.Id, id), ct);
             return NoContent();
         }
     }
