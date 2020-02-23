@@ -12,7 +12,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             Name = name;
             RowVersion = rowVersion;
         }
-        
+
         public string UserId { get; }
         public long GroupId { get; }
         public string Name { get; }

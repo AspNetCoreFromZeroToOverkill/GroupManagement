@@ -8,7 +8,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             Name = name;
             RowVersion = rowVersion;
         }
-        
+
         public long Id { get; }
         public string Name { get; }
         public string RowVersion { get; }

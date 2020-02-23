@@ -17,22 +17,22 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public sealed class Left : Either<TLeft, TRight>
         {
-            public TLeft Value { get; }
-
             public Left(TLeft value)
             {
                 Value = value;
             }
+
+            public TLeft Value { get; }
         }
 
         public sealed class Right : Either<TLeft, TRight>
         {
-            public TRight Value { get; }
-
             public Right(TRight value)
             {
                 Value = value;
             }
+
+            public TRight Value { get; }
         }
     }
 }

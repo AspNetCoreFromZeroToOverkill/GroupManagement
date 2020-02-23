@@ -9,7 +9,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
             RowVersion = rowVersion;
             Creator = creator;
         }
-        
+
         public long Id { get; }
         public string Name { get; }
         public string RowVersion { get; }
