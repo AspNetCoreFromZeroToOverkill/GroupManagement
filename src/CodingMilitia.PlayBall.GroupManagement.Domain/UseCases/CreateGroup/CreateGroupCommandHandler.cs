@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
@@ -19,9 +18,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
             IVersionedRepository<Group, uint> groupsRepository,
             IQueryHandler<UserByIdQuery, Optional<User>> userByIdQueryHandler)
         {
-            _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
-            _userByIdQueryHandler =
-                userByIdQueryHandler ?? throw new ArgumentNullException(nameof(userByIdQueryHandler));
+            _groupsRepository = Ensure.NotNull(groupsRepository, nameof(groupsRepository));
+            _userByIdQueryHandler = Ensure.NotNull(userByIdQueryHandler, nameof(userByIdQueryHandler));
         }
 
         public async Task<Either<Error, CreateGroupCommandResult>> Handle(
@@ -33,9 +31,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
                 cancellationToken);
 
             if (!maybeUser.TryGetValue(out var currentUser))
-            {
                 return Result.Invalid<CreateGroupCommandResult>("Invalid user to create a group.");
-            }
 
             var group = new Group(request.Name, currentUser);
 

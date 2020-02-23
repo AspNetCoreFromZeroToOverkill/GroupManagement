@@ -21,23 +21,22 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
                 : None<T>();
     }
 
-    public struct Optional<T>
+    public readonly struct Optional<T>
     {
-        private readonly bool _hasValue;
         private readonly T _value;
 
-        public bool HasValue => _hasValue;
+        public bool HasValue { get; }
 
         internal Optional(T value, bool hasValue)
         {
             _value = value;
-            _hasValue = hasValue;
+            HasValue = hasValue;
         }
 
         public bool TryGetValue(out T value)
         {
-            value = _hasValue ? _value : default;
-            return _hasValue;
+            value = HasValue ? _value : default;
+            return HasValue;
         }
     }
 }

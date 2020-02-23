@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
@@ -12,16 +10,15 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
 {
     public class DeleteGroupCommandHandler : IRequestHandler<DeleteGroupCommand, Unit>
     {
-        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
         private readonly IVersionedRepository<Group, uint> _groupsRepository;
+        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
 
         public DeleteGroupCommandHandler(
             IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler,
             IVersionedRepository<Group, uint> groupsRepository)
         {
-            _userGroupQueryHandler =
-                userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));
-            _groupsRepository = groupsRepository ?? throw new ArgumentNullException(nameof(groupsRepository));
+            _userGroupQueryHandler = Ensure.NotNull(userGroupQueryHandler, nameof(userGroupQueryHandler));
+            _groupsRepository = Ensure.NotNull(groupsRepository, nameof(groupsRepository));
         }
 
         public async Task<Unit> Handle(DeleteGroupCommand request, CancellationToken cancellationToken)
@@ -32,10 +29,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
 
             await maybeGroup.MatchSomeAsync(async group =>
             {
-                if (group.IsAdmin(request.UserId))
-                {
-                    await _groupsRepository.DeleteAsync(group, cancellationToken);
-                }
+                if (group.IsAdmin(request.UserId)) await _groupsRepository.DeleteAsync(@group, cancellationToken);
             });
 
             return Unit.Value;

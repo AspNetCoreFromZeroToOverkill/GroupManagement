@@ -7,10 +7,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
     {
         public static Optional<TOut> Map<TIn, TOut>(this Optional<TIn> maybeValue, Func<TIn, TOut> mapper)
         {
-            if (mapper is null)
-            {
-                throw new ArgumentNullException(nameof(mapper));
-            }
+            Ensure.NotNull(mapper, nameof(mapper));
 
             return maybeValue.TryGetValue(out var value)
                 ? Optional.Some(mapper(value))
@@ -19,11 +16,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static T ValueOr<T>(this Optional<T> maybeValue, Func<T> alternativeFactory)
         {
-            if (alternativeFactory is null)
-            {
-                throw new ArgumentNullException(nameof(alternativeFactory));
-            }
-            
+            Ensure.NotNull(alternativeFactory, nameof(alternativeFactory));
+
             return maybeValue.TryGetValue(out var value)
                 ? value
                 : alternativeFactory();
@@ -31,15 +25,8 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static TOut MapValueOr<TIn, TOut>(this Optional<TIn> maybeValue, Func<TIn, TOut> some, Func<TOut> none)
         {
-            if (some is null)
-            {
-                throw new ArgumentNullException(nameof(some));
-            }
-
-            if (none is null)
-            {
-                throw new ArgumentNullException(nameof(none));
-            }
+            Ensure.NotNull(some, nameof(some));
+            Ensure.NotNull(none, nameof(none));
 
             return maybeValue.TryGetValue(out var value)
                 ? some(value)
@@ -48,32 +35,18 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static void Match<T>(this Optional<T> maybeValue, Action<T> some, Action none)
         {
-            if (some is null)
-            {
-                throw new ArgumentNullException(nameof(some));
-            }
-
-            if (none is null)
-            {
-                throw new ArgumentNullException(nameof(none));
-            }
+            Ensure.NotNull(some, nameof(some));
+            Ensure.NotNull(none, nameof(none));
 
             if (maybeValue.TryGetValue(out var value))
-            {
                 some(value);
-            }
             else
-            {
                 none();
-            }
         }
 
         public static void MatchSome<T>(this Optional<T> maybeValue, Action<T> some)
         {
-            if (some is null)
-            {
-                throw new ArgumentNullException(nameof(some));
-            }
+            Ensure.NotNull(some, nameof(some));
 
             if (maybeValue.TryGetValue(out var value))
             {
@@ -83,10 +56,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static async Task MatchSomeAsync<T>(this Optional<T> maybeValue, Func<T, Task> some)
         {
-            if (some is null)
-            {
-                throw new ArgumentNullException(nameof(some));
-            }
+            Ensure.NotNull(some, nameof(some));
 
             if (maybeValue.TryGetValue(out var value))
             {
@@ -96,10 +66,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static void MatchNone<T>(this Optional<T> maybeValue, Action none)
         {
-            if (none is null)
-            {
-                throw new ArgumentNullException(nameof(none));
-            }
+            Ensure.NotNull(none, nameof(none));
 
             if (!maybeValue.TryGetValue(out _))
             {
@@ -109,10 +76,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
 
         public static async Task MatchNoneAsync<T>(this Optional<T> maybeValue, Func<Task> none)
         {
-            if (none is null)
-            {
-                throw new ArgumentNullException(nameof(none));
-            }
+            Ensure.NotNull(none, nameof(none));
 
             if (!maybeValue.TryGetValue(out _))
             {

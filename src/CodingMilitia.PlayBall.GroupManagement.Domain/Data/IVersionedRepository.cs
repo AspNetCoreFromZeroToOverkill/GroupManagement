@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.Data
 {
-    public interface IVersionedRepository<TEntity, TVersion> 
+    public interface IVersionedRepository<TEntity, TVersion>
         where TEntity : IVersionedEntity<TVersion>
         where TVersion : IComparable<TVersion>
     {
