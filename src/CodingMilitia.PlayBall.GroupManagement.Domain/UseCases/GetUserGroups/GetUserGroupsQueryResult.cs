@@ -8,9 +8,9 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
         {
             Groups = groups;
         }
-        
+
         public IReadOnlyCollection<Group> Groups { get; set; }
-        
+
         public class Group
         {
             public Group(long id, string name, string rowVersion, User creator)
@@ -20,7 +20,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
                 RowVersion = rowVersion;
                 Creator = creator;
             }
-            
+
             public long Id { get; }
             public string Name { get; }
             public string RowVersion { get; }
@@ -34,7 +34,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
                 Id = id;
                 Name = name;
             }
-            
+
             public string Id { get; }
             public string Name { get; }
         }

@@ -1,4 +1,3 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
@@ -9,15 +8,15 @@ using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDetail
 {
-    public sealed class GetUserGroupQueryHandler : IRequestHandler<GetUserGroupQuery, Either<Error, GetUserGroupQueryResult>>
+    public sealed class GetUserGroupQueryHandler
+        : IRequestHandler<GetUserGroupQuery, Either<Error, GetUserGroupQueryResult>>
     {
         private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
 
 
         public GetUserGroupQueryHandler(IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler)
         {
-            _userGroupQueryHandler =
-                userGroupQueryHandler ?? throw new ArgumentNullException(nameof(userGroupQueryHandler));
+            _userGroupQueryHandler = Ensure.NotNull(userGroupQueryHandler, nameof(userGroupQueryHandler));
         }
 
 

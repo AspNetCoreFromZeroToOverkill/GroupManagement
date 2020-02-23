@@ -8,7 +8,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
         {
             UserId = userId;
         }
-        
+
         public string UserId { get; }
     }
 }

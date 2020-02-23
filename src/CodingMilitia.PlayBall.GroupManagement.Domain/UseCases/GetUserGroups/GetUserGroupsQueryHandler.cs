@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -6,6 +5,7 @@ using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Entities;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using MediatR;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
@@ -17,7 +17,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
         public GetUserGroupsQueryHandler(
             IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>> userGroupsQueryHandler)
         {
-            _userGroupsQueryHandler = userGroupsQueryHandler?? throw new ArgumentNullException(nameof(userGroupsQueryHandler));
+            _userGroupsQueryHandler = Ensure.NotNull(userGroupsQueryHandler, nameof(userGroupsQueryHandler));
         }
 
         public async Task<GetUserGroupsQueryResult> Handle(
@@ -30,11 +30,11 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
 
             return new GetUserGroupsQueryResult(
                 groups.MapAsReadOnly(g =>
-                        new GetUserGroupsQueryResult.Group(
-                            g.Id,
-                            g.Name,
-                            g.RowVersion.ToString(),
-                            new GetUserGroupsQueryResult.User(g.Creator.Id, g.Creator.Name))));
+                    new GetUserGroupsQueryResult.Group(
+                        g.Id,
+                        g.Name,
+                        g.RowVersion.ToString(),
+                        new GetUserGroupsQueryResult.User(g.Creator.Id, g.Creator.Name))));
         }
     }
 }

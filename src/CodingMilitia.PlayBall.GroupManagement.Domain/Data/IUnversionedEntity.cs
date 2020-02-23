@@ -5,6 +5,5 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Data
     /// </summary>
     public interface IUnversionedEntity
     {
-        
     }
 }
