@@ -9,7 +9,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.Shared
             => new Either<TLeft, TRight>.Right(value);
     }
 
-    public class Either<TLeft, TRight>
+    public abstract class Either<TLeft, TRight>
     {
         private Either()
         {
