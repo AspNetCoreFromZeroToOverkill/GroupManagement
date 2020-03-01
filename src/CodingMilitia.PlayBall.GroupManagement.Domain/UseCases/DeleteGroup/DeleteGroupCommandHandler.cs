@@ -29,7 +29,10 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
 
             await maybeGroup.MatchSomeAsync(async group =>
             {
-                if (group.IsAdmin(request.UserId)) await _groupsRepository.DeleteAsync(@group, cancellationToken);
+                if (group.IsAdmin(request.UserId))
+                {
+                    await _groupsRepository.DeleteAsync(@group, cancellationToken);
+                }
             });
 
             return Unit.Value;
