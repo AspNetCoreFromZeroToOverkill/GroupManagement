@@ -51,17 +51,14 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
             long id,
             UpdateGroupDetailsCommandModel model,
             CancellationToken ct)
-        {
-            var result = await _mediator.Send(
-                new UpdateGroupDetailsCommand(
-                    _currentUserAccessor.Id,
-                    id,
-                    model.Name,
-                    model.RowVersion),
-                ct);
-
-            return result.ToActionResult();
-        }
+            => (await _mediator.Send(
+                    new UpdateGroupDetailsCommand(
+                        _currentUserAccessor.Id,
+                        id,
+                        model.Name,
+                        model.RowVersion),
+                    ct))
+                .ToActionResult();
 
         [HttpPut]
         [HttpPost]
@@ -69,12 +66,17 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features.Groups
         public async Task<ActionResult<CreateGroupCommandResult>> AddAsync(
             CreateGroupCommandModel model,
             CancellationToken ct)
-        {
-            var result = await _mediator.Send(new CreateGroupCommand(_currentUserAccessor.Id, model.Name), ct);
-
-            return result.ToUntypedActionResult(
-                success => CreatedAtAction(GetByIdActionName, new {id = success.Id}, result));
-        }
+            => (await _mediator.Send(
+                    new CreateGroupCommand(
+                        _currentUserAccessor.Id,
+                        model.Name),
+                    ct))
+                .ToUntypedActionResult(
+                    success => 
+                        CreatedAtAction(
+                            GetByIdActionName,
+                            new {id = success.Id},
+                            success));
 
         [HttpDelete]
         [Route("{id}")]
