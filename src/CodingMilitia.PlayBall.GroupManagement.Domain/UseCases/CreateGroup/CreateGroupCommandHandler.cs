@@ -31,7 +31,9 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
                 cancellationToken);
 
             if (!maybeUser.TryGetValue(out var currentUser))
+            {
                 return Result.Invalid<CreateGroupCommandResult>("Invalid user to create a group.");
+            }
 
             var group = new Group(request.Name, currentUser);
 
