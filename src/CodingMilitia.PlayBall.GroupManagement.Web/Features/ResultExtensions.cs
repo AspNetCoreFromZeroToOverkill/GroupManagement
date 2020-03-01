@@ -31,7 +31,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features
             TValue result,
             Func<TValue, TModel> valueMapper)
             => result is Unit
-                ? (ActionResult<TModel>) new ContentResult()
+                ? (ActionResult<TModel>) new NoContentResult()
                 : valueMapper(result);
 
         private static ActionResult<TModel> ToErrorResult<TModel>(Error error)
