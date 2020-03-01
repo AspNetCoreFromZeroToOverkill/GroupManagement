@@ -34,16 +34,21 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
                 cancellationToken);
 
             if (!maybeGroup.TryGetValue(out var group))
+            {
                 return Result.NotFound<UpdateGroupDetailsCommandResult>(
                     $"Group with id {request.GroupId} not found.");
+            }
+
 
             var maybeUser = await _userByIdQueryHandler.HandleAsync(
                 new UserByIdQuery(request.UserId),
                 cancellationToken);
 
             if (!maybeUser.TryGetValue(out var currentUser))
+            {
                 return Result.Invalid<UpdateGroupDetailsCommandResult>(
                     "Invalid user to create a group.");
+            }
 
             return await group
                 .Rename(currentUser, request.Name)
