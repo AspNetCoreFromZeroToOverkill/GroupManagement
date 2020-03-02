@@ -1,4 +1,5 @@
 using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Web.Features
@@ -14,6 +15,6 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.Features
 
 
         public ActionResult<TModel> Visit(Error.Unauthorized result)
-            => new UnauthorizedObjectResult(result.Message);
+            => new StatusCodeResult(StatusCodes.Status403Forbidden);
     }
 }
