@@ -11,12 +11,12 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDet
     public sealed class GetUserGroupQueryHandler
         : IRequestHandler<GetUserGroupQuery, Either<Error, GetUserGroupQueryResult>>
     {
-        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
+        private readonly QueryRunner<UserGroupQuery, Optional<Group>> _getUserGroup;
 
 
-        public GetUserGroupQueryHandler(IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler)
+        public GetUserGroupQueryHandler(QueryRunner<UserGroupQuery, Optional<Group>> getUserGroup)
         {
-            _userGroupQueryHandler = Ensure.NotNull(userGroupQueryHandler, nameof(userGroupQueryHandler));
+            _getUserGroup = Ensure.NotNull(getUserGroup, nameof(getUserGroup));
         }
 
 
@@ -24,7 +24,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroupDet
             GetUserGroupQuery request,
             CancellationToken cancellationToken)
         {
-            var maybeGroup = await _userGroupQueryHandler.HandleAsync(
+            var maybeGroup = await _getUserGroup(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 

@@ -12,19 +12,19 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups
 {
     public sealed class GetUserGroupsQueryHandler : IRequestHandler<GetUserGroupsQuery, GetUserGroupsQueryResult>
     {
-        private readonly IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>> _userGroupsQueryHandler;
+        private readonly QueryRunner<UserGroupsQuery, IReadOnlyCollection<Group>> _getUserGroups;
 
         public GetUserGroupsQueryHandler(
-            IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>> userGroupsQueryHandler)
+            QueryRunner<UserGroupsQuery, IReadOnlyCollection<Group>> getUserGroups)
         {
-            _userGroupsQueryHandler = Ensure.NotNull(userGroupsQueryHandler, nameof(userGroupsQueryHandler));
+            _getUserGroups = Ensure.NotNull(getUserGroups, nameof(getUserGroups));
         }
 
         public async Task<GetUserGroupsQueryResult> Handle(
             GetUserGroupsQuery request,
             CancellationToken cancellationToken)
         {
-            var groups = await _userGroupsQueryHandler.HandleAsync(
+            var groups = await _getUserGroups(
                 new UserGroupsQuery(request.UserId),
                 cancellationToken);
 

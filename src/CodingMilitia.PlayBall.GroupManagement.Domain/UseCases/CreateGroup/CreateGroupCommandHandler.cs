@@ -12,21 +12,21 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.CreateGroup
         : IRequestHandler<CreateGroupCommand, Either<Error, CreateGroupCommandResult>>
     {
         private readonly IVersionedRepository<Group, uint> _groupsRepository;
-        private readonly IQueryHandler<UserByIdQuery, Optional<User>> _userByIdQueryHandler;
+        private readonly QueryRunner<UserByIdQuery, Optional<User>> _getUserById;
 
         public CreateGroupCommandHandler(
             IVersionedRepository<Group, uint> groupsRepository,
-            IQueryHandler<UserByIdQuery, Optional<User>> userByIdQueryHandler)
+            QueryRunner<UserByIdQuery, Optional<User>> getUserById)
         {
             _groupsRepository = Ensure.NotNull(groupsRepository, nameof(groupsRepository));
-            _userByIdQueryHandler = Ensure.NotNull(userByIdQueryHandler, nameof(userByIdQueryHandler));
+            _getUserById = Ensure.NotNull(getUserById, nameof(getUserById));
         }
 
         public async Task<Either<Error, CreateGroupCommandResult>> Handle(
             CreateGroupCommand request,
             CancellationToken cancellationToken)
         {
-            var maybeUser = await _userByIdQueryHandler.HandleAsync(
+            var maybeUser = await _getUserById(
                 new UserByIdQuery(request.UserId),
                 cancellationToken);
 

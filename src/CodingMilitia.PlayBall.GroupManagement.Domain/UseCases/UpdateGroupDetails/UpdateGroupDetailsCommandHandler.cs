@@ -12,16 +12,16 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
         : IRequestHandler<UpdateGroupDetailsCommand, Either<Error, UpdateGroupDetailsCommandResult>>
     {
         private readonly IVersionedRepository<Group, uint> _groupsRepository;
-        private readonly IQueryHandler<UserByIdQuery, Optional<User>> _userByIdQueryHandler;
-        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
+        private readonly QueryRunner<UserByIdQuery, Optional<User>> _getUserById;
+        private readonly QueryRunner<UserGroupQuery, Optional<Group>> _getUserGroup;
 
         public UpdateGroupDetailsCommandHandler(
-            IQueryHandler<UserByIdQuery, Optional<User>> userByIdQueryHandler,
-            IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler,
+            QueryRunner<UserByIdQuery, Optional<User>> getUserById,
+            QueryRunner<UserGroupQuery, Optional<Group>> getUserGroup,
             IVersionedRepository<Group, uint> groupsRepository)
         {
-            _userByIdQueryHandler = Ensure.NotNull(userByIdQueryHandler, nameof(userByIdQueryHandler));
-            _userGroupQueryHandler = Ensure.NotNull(userGroupQueryHandler, nameof(userGroupQueryHandler));
+            _getUserById = Ensure.NotNull(getUserById, nameof(getUserById));
+            _getUserGroup = Ensure.NotNull(getUserGroup, nameof(getUserGroup));
             _groupsRepository = Ensure.NotNull(groupsRepository, nameof(groupsRepository));
         }
 
@@ -29,7 +29,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             UpdateGroupDetailsCommand request,
             CancellationToken cancellationToken)
         {
-            var maybeGroup = await _userGroupQueryHandler.HandleAsync(
+            var maybeGroup = await _getUserGroup(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 
@@ -40,7 +40,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.UpdateGroupDeta
             }
 
 
-            var maybeUser = await _userByIdQueryHandler.HandleAsync(
+            var maybeUser = await _getUserById(
                 new UserByIdQuery(request.UserId),
                 cancellationToken);
 

@@ -1,12 +1,16 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data;
+using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
 using CodingMilitia.PlayBall.GroupManagement.Web.Services;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
+using UseCases = CodingMilitia.PlayBall.GroupManagement.Domain.UseCases;
 
 // ReSharper disable once CheckNamespace - for better discoverability
 namespace Microsoft.Extensions.DependencyInjection
@@ -57,38 +61,30 @@ namespace Microsoft.Extensions.DependencyInjection
         public static IServiceCollection AddBusiness(this IServiceCollection services)
         {
             services.AddMediatR(
-                typeof(CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.GetUserGroups.GetUserGroupsQuery));
+                typeof(UseCases.GetUserGroups.GetUserGroupsQuery));
 
             return services;
         }
 
         public static IServiceCollection AddInfrastructure(this IServiceCollection services)
         {
-            services.AddSingleton<ICurrentUserAccessor, CurrentUserAccessor>();
-            services.AddScoped(typeof(EfRepository<>));
-            services.Scan(scan =>
-                scan
-                    .FromAssembliesOf(typeof(GroupManagementDbContext))
-                    .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
-                        .AsImplementedInterfaces()
-                        .WithScopedLifetime()
-                    .AddClasses(classes => classes.AssignableTo(typeof(IVersionedRepository<,>)))
-                        .AsImplementedInterfaces()
-                        .WithScopedLifetime()
-                    .AddClasses(classes => classes.AssignableTo(typeof(IQueryHandler<,>)))
-                        .AsImplementedInterfaces()
-                        .WithScopedLifetime()
-                );
-            
-            // without Scrutor (or an alternative) we'd need to do everything by hand, like:
-            /*
-                services.AddScoped<IRepository<Group, long>, EfRepository<Group, long>>();
-                services.AddScoped<IRepository<User, string>, EfRepository<User, string>>();
-                services.AddScoped<IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>>, UserGroupsQueryHandler>();
-                services.AddScoped<IQueryHandler<UserGroupQuery, Group>, UserGroupQueryHandler>();
-                // ...
-            */
-            return services;
+            return services
+                .AddSingleton<ICurrentUserAccessor, CurrentUserAccessor>()
+                .AddScoped(typeof(EfRepository<>))
+                .Scan(scan =>
+                    scan
+                        .FromAssembliesOf(typeof(GroupManagementDbContext))
+                        .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
+                            .AsImplementedInterfaces()
+                            .WithScopedLifetime()
+                        .AddClasses(classes => classes.AssignableTo(typeof(IVersionedRepository<,>)))
+                            .AsImplementedInterfaces()
+                            .WithScopedLifetime()
+                        .AddClasses(classes => classes.AssignableTo(typeof(IQueryRunner<,>)))
+                            .AsImplementedInterfaces()
+                            .WithScopedLifetime()
+                )
+                .AddRegisteredQueryRunnersAsDelegates();
         }
 
         public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)
@@ -102,5 +98,33 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddSingleton(config);
             return config;
         }
+
+        private static IServiceCollection AddRegisteredQueryRunnersAsDelegates(this IServiceCollection services)
+        {
+            var registerMethod = typeof(ServiceCollectionExtensions)
+                .GetMethod(nameof(RegisterQueryRunnerAsDelegate), BindingFlags.Static | BindingFlags.NonPublic);
+
+            var queryRunnerTypes = services
+                .Where(descriptor => 
+                        descriptor.ServiceType.IsGenericType 
+                        && descriptor.ServiceType.GetGenericTypeDefinition() == typeof(IQueryRunner<,>))
+                .ToList();
+
+            foreach (var queryRunnerType in queryRunnerTypes)
+            {
+                var parameterizedRegisterMethod = registerMethod!.MakeGenericMethod(queryRunnerType.ServiceType.GenericTypeArguments);
+                parameterizedRegisterMethod.Invoke(null, new object[] {services});
+            }
+
+            return services;
+        }
+        
+        private static void RegisterQueryRunnerAsDelegate<TQuery, TQueryResult>(IServiceCollection services)
+            where TQuery : IQuery<TQueryResult>
+        {
+            services.AddScoped<QueryRunner<TQuery,TQueryResult>>(
+                provider => provider.GetRequiredService<IQueryRunner<TQuery, TQueryResult>>().RunAsync);
+        }
+
     }
 }
