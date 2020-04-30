@@ -7,16 +7,16 @@ using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries
 {
-    public class UserByIdQueryHandler : IQueryHandler<UserByIdQuery, Optional<User>>
+    public class UserByIdQueryRunner : IQueryRunner<UserByIdQuery, Optional<User>>
     {
         private readonly GroupManagementDbContext _db;
 
-        public UserByIdQueryHandler(GroupManagementDbContext db)
+        public UserByIdQueryRunner(GroupManagementDbContext db)
         {
             _db = db;
         }
 
-        public async Task<Optional<User>> HandleAsync(UserByIdQuery query, CancellationToken ct)
+        public async Task<Optional<User>> RunAsync(UserByIdQuery query, CancellationToken ct)
             => Optional.FromNullable(await _db.Set<User>().FindAsync(new object[] {query.UserId}, ct));
     }
 }

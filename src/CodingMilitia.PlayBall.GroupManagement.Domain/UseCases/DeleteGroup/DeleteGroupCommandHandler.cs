@@ -11,19 +11,19 @@ namespace CodingMilitia.PlayBall.GroupManagement.Domain.UseCases.DeleteGroup
     public class DeleteGroupCommandHandler : IRequestHandler<DeleteGroupCommand, Unit>
     {
         private readonly IVersionedRepository<Group, uint> _groupsRepository;
-        private readonly IQueryHandler<UserGroupQuery, Optional<Group>> _userGroupQueryHandler;
+        private readonly QueryRunner<UserGroupQuery, Optional<Group>> _getUserGroup;
 
         public DeleteGroupCommandHandler(
-            IQueryHandler<UserGroupQuery, Optional<Group>> userGroupQueryHandler,
+            QueryRunner<UserGroupQuery, Optional<Group>> getUserGroup,
             IVersionedRepository<Group, uint> groupsRepository)
         {
-            _userGroupQueryHandler = Ensure.NotNull(userGroupQueryHandler, nameof(userGroupQueryHandler));
+            _getUserGroup = Ensure.NotNull(getUserGroup, nameof(getUserGroup));
             _groupsRepository = Ensure.NotNull(groupsRepository, nameof(groupsRepository));
         }
 
         public async Task<Unit> Handle(DeleteGroupCommand request, CancellationToken cancellationToken)
         {
-            var maybeGroup = await _userGroupQueryHandler.HandleAsync(
+            var maybeGroup = await _getUserGroup(
                 new UserGroupQuery(request.UserId, request.GroupId),
                 cancellationToken);
 

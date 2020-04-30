@@ -1,30 +1,28 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Entities;
+using CodingMilitia.PlayBall.GroupManagement.Domain.Shared;
 using Microsoft.EntityFrameworkCore;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries
 {
-    public class UserGroupsQueryHandler : IQueryHandler<UserGroupsQuery, IReadOnlyCollection<Group>>
+    public class UserGroupQueryRunner : IQueryRunner<UserGroupQuery, Optional<Group>>
     {
         private readonly GroupManagementDbContext _db;
 
-        public UserGroupsQueryHandler(GroupManagementDbContext db)
+        public UserGroupQueryRunner(GroupManagementDbContext db)
         {
             _db = db;
         }
 
-        public async Task<IReadOnlyCollection<Group>> HandleAsync(UserGroupsQuery query, CancellationToken ct)
-            => (await _db
+        public async Task<Optional<Group>> RunAsync(UserGroupQuery query, CancellationToken ct)
+            => Optional.FromNullable(await _db
                 .Groups
                 .Include(g => g.Creator)
-                .Where(g => g.GroupUsers.Any(gu => gu.UserId == query.UserId))
-                .OrderBy(g => g.Id)
-                .ToListAsync(ct))
-                .AsReadOnly();
+                .Include(g => g.GroupUsers)
+                .SingleOrDefaultAsync(g => g.Id == query.GroupId && g.GroupUsers.Any(gu => gu.UserId == query.UserId), ct));
     }
 }

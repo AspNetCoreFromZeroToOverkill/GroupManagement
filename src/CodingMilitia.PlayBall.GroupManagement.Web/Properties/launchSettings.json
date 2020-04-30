@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "CodingMilitia.PlayBall.GroupManagement.Web": {
+      "commandName": "Project",
+      "launchBrowser": false,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5002;https://localhost:5003"
+    }
+  }
+}
