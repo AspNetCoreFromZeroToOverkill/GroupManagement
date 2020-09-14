@@ -11,6 +11,8 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\..\Auth\src\CodingMilitia.PlayBall.Auth.Events\CodingMilitia.PlayBall.Auth.Events.csproj" />
+      <ProjectReference Include="..\..\..\Shared\src\CodingMilitia.PlayBall.Shared.EventBus\CodingMilitia.PlayBall.Shared.EventBus.csproj" />
       <ProjectReference Include="..\CodingMilitia.PlayBall.GroupManagement.Domain\CodingMilitia.PlayBall.GroupManagement.Domain.csproj" />
     </ItemGroup>
 

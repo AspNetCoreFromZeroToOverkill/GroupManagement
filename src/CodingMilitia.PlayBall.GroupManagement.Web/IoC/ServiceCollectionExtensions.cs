@@ -1,12 +1,19 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using CodingMilitia.PlayBall.Auth.Events;
 using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries;
+using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Events;
+using CodingMilitia.PlayBall.GroupManagement.Web.BackgroundWorkers;
 using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
 using CodingMilitia.PlayBall.GroupManagement.Web.Services;
+using CodingMilitia.PlayBall.Shared.EventBus.Kafka;
+using CodingMilitia.PlayBall.Shared.EventBus.Kafka.Configuration;
+using CodingMilitia.PlayBall.Shared.EventBus.Serialization;
+using Confluent.Kafka;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -17,6 +24,18 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
+        public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)
+            where TConfig : class, new()
+        {
+            if (services == null) throw new ArgumentNullException(nameof(services));
+            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
+
+            var config = new TConfig();
+            configuration.Bind(config);
+            services.AddSingleton(config);
+            return config;
+        }
+
         public static IServiceCollection AddRequiredMvcComponents(this IServiceCollection services)
         {
             services.AddTransient<ApiExceptionFilter>();
@@ -66,7 +85,7 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             return services
                 .AddSingleton<ICurrentUserAccessor, CurrentUserAccessor>()
@@ -75,28 +94,17 @@ namespace Microsoft.Extensions.DependencyInjection
                     scan
                         .FromAssembliesOf(typeof(GroupManagementDbContext))
                         .AddClasses(classes => classes.AssignableTo(typeof(IRepository<>)))
-                            .AsImplementedInterfaces()
-                            .WithScopedLifetime()
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
                         .AddClasses(classes => classes.AssignableTo(typeof(IVersionedRepository<,>)))
-                            .AsImplementedInterfaces()
-                            .WithScopedLifetime()
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
                         .AddClasses(classes => classes.AssignableTo(typeof(IQueryRunner<,>)))
-                            .AsImplementedInterfaces()
-                            .WithScopedLifetime()
+                        .AsImplementedInterfaces()
+                        .WithScopedLifetime()
                 )
-                .AddRegisteredQueryRunnersAsDelegates();
-        }
-
-        public static TConfig ConfigurePOCO<TConfig>(this IServiceCollection services, IConfiguration configuration)
-            where TConfig : class, new()
-        {
-            if (services == null) throw new ArgumentNullException(nameof(services));
-            if (configuration == null) throw new ArgumentNullException(nameof(configuration));
-
-            var config = new TConfig();
-            configuration.Bind(config);
-            services.AddSingleton(config);
-            return config;
+                .AddRegisteredQueryRunnersAsDelegates()
+                .AddEvents(configuration);
         }
 
         private static IServiceCollection AddRegisteredQueryRunnersAsDelegates(this IServiceCollection services)
@@ -105,26 +113,39 @@ namespace Microsoft.Extensions.DependencyInjection
                 .GetMethod(nameof(RegisterQueryRunnerAsDelegate), BindingFlags.Static | BindingFlags.NonPublic);
 
             var queryRunnerTypes = services
-                .Where(descriptor => 
-                        descriptor.ServiceType.IsGenericType 
-                        && descriptor.ServiceType.GetGenericTypeDefinition() == typeof(IQueryRunner<,>))
+                .Where(descriptor =>
+                    descriptor.ServiceType.IsGenericType
+                    && descriptor.ServiceType.GetGenericTypeDefinition() == typeof(IQueryRunner<,>))
                 .ToList();
 
             foreach (var queryRunnerType in queryRunnerTypes)
             {
-                var parameterizedRegisterMethod = registerMethod!.MakeGenericMethod(queryRunnerType.ServiceType.GenericTypeArguments);
+                var parameterizedRegisterMethod =
+                    registerMethod!.MakeGenericMethod(queryRunnerType.ServiceType.GenericTypeArguments);
                 parameterizedRegisterMethod.Invoke(null, new object[] {services});
             }
 
             return services;
         }
-        
+
         private static void RegisterQueryRunnerAsDelegate<TQuery, TQueryResult>(IServiceCollection services)
             where TQuery : IQuery<TQueryResult>
         {
-            services.AddScoped<QueryRunner<TQuery,TQueryResult>>(
+            services.AddScoped<QueryRunner<TQuery, TQueryResult>>(
                 provider => provider.GetRequiredService<IQueryRunner<TQuery, TQueryResult>>().RunAsync);
         }
 
+        private static IServiceCollection AddEvents(this IServiceCollection services, IConfiguration configuration)
+        {
+            return services
+                .AddHostedService<EventConsumerBackgroundService>()
+                .AddScoped<IEventHandler<BaseUserEvent>, AuthUserEventHandler>()
+                .AddKafkaTopicConsumer<string, BaseUserEvent>(
+                    "UserAccountEvents",
+                    configuration.GetSection(nameof(KafkaSettings)).Get<KafkaSettings>(),
+                    configuration.GetSection(nameof(KafkaConsumerSettings)).Get<KafkaConsumerSettings>(),
+                    Deserializers.Utf8,
+                    JsonEventSerializer<BaseUserEvent>.Instance);
+        }
     }
 }

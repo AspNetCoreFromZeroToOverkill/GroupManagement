@@ -36,7 +36,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web
             services
                 .AddDatabaseInitializer<GroupManagementDbContext>()
                 .AddBusiness()
-                .AddInfrastructure()
+                .AddInfrastructure(_config)
                 .AddConfiguredAuthentication(_config)
                 .AddConfiguredAuthorization()
                 .AddHttpContextAccessor();
