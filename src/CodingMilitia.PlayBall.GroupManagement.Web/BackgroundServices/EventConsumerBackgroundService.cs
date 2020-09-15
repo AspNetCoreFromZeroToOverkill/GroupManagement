@@ -6,7 +6,7 @@ using CodingMilitia.PlayBall.Shared.EventBus;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace CodingMilitia.PlayBall.GroupManagement.Web.BackgroundWorkers
+namespace CodingMilitia.PlayBall.GroupManagement.Web.BackgroundServices
 {
     public class EventConsumerBackgroundService : BackgroundService
     {
@@ -26,7 +26,7 @@ namespace CodingMilitia.PlayBall.GroupManagement.Web.BackgroundWorkers
         {
             using var scope = _scopeFactory.CreateScope();
             var eventHandler = scope.ServiceProvider.GetRequiredService<IEventHandler<BaseUserEvent>>();
-            await eventHandler.HandleAsync(@event);
+            await eventHandler.HandleAsync(@event, ct);
         }
     }
 }

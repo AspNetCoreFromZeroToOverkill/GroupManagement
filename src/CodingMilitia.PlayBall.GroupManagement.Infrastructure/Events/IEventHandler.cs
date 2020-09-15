@@ -1,9 +1,10 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CodingMilitia.PlayBall.GroupManagement.Infrastructure.Events
 {
     public interface IEventHandler<in TEvent>
     {
-        Task HandleAsync(TEvent @event);
+        Task HandleAsync(TEvent @event, CancellationToken ct);
     }
 }

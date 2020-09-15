@@ -6,7 +6,7 @@ using CodingMilitia.PlayBall.GroupManagement.Domain.Data;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Data.Queries;
 using CodingMilitia.PlayBall.GroupManagement.Infrastructure.Events;
-using CodingMilitia.PlayBall.GroupManagement.Web.BackgroundWorkers;
+using CodingMilitia.PlayBall.GroupManagement.Web.BackgroundServices;
 using CodingMilitia.PlayBall.GroupManagement.Web.Configuration;
 using CodingMilitia.PlayBall.GroupManagement.Web.Filters;
 using CodingMilitia.PlayBall.GroupManagement.Web.Services;
